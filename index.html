@@ -26,21 +26,43 @@
       <div class="landing-content">
         <section class="release-box" aria-labelledby="release-title">
           <p class="release-kicker">Xabarim</p>
-          <h1 class="release-title" id="release-title">Tez orada ishga tushiriladi</h1>
-          <div class="release-card" aria-label="Ilova ishga tushishigacha qolgan vaqt">
-            <div class="countdown-unit"><div class="number" id="day"></div><div class="date-detail">kun</div></div>
-            <div class="countdown-unit"><div class="number" id="hour"></div><div class="date-detail">soat</div></div>
-            <div class="countdown-unit"><div class="number" id="second"></div><div class="date-detail">soniya</div></div>
+          <h1 class="release-title" id="release-title">
+            Tez orada ishga tushiriladi
+          </h1>
+          <div
+            class="release-card"
+            aria-label="Ilova ishga tushishigacha qolgan vaqt">
+            <div class="countdown-unit">
+              <div class="number" id="day"></div>
+              <div class="date-detail">kun</div>
+            </div>
+            <div class="countdown-unit">
+              <div class="number" id="hour"></div>
+              <div class="date-detail">soat</div>
+            </div>
+            <div class="countdown-unit">
+              <div class="number" id="second"></div>
+              <div class="date-detail">soniya</div>
+            </div>
           </div>
-          <p class="release-date">Mobil ilova ishga tushish sanasi: <strong>19-noyabr, 2026</strong></p>
+          <p class="release-date">
+            Mobil ilova ishga tushish sanasi: <strong>19-noyabr, 2026</strong>
+          </p>
         </section>
         <section class="web-launch" aria-label="Xabarim web versiyasi">
           <div class="web-launch__copy">
             <span class="web-launch__eyebrow">Web versiya</span>
             <h2>Xabarim’dan hoziroq foydalaning</h2>
-            <p>Do‘stlaringiz bilan xabarlashing, postlar ulashing va Xabarim imkoniyatlarini brauzerda sinab ko‘ring.</p>
+            <p>
+              Do‘stlaringiz bilan xabarlashing, postlar ulashing va Xabarim
+              imkoniyatlarini brauzerda sinab ko‘ring.
+            </p>
           </div>
-          <a href="https://www.xabarim.uz/pages/app.html" class="web-launch__button">Web versiyani ochish <span aria-hidden="true">↗</span></a>
+          <a
+            href="https://www.xabarim.uz/pages/app.html"
+            class="web-launch__button"
+            >Web versiyani ochish <span aria-hidden="true">↗</span></a
+          >
         </section>
       </div>
     </main>
@@ -59,8 +81,13 @@
           return;
         }
         try {
-          const client = window.supabase.createClient(config.url, config.anonKey);
-          const { data: { session } } = await client.auth.getSession();
+          const client = window.supabase.createClient(
+            config.url,
+            config.anonKey,
+          );
+          const {
+            data: { session },
+          } = await client.auth.getSession();
           location.replace(session ? "/pages/main.html" : appUrl);
         } catch (error) {
           console.warn("Xabarim sessiyasini tekshirib bo‘lmadi:", error);
