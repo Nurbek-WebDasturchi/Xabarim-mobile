@@ -63,6 +63,17 @@ npx eas-cli@latest build --platform android --profile preview
 
 Build serverda bajariladi. Tugagach terminal APK yuklab olish havolasini chiqaradi. Havolani brauzerda ochib `.apk` faylni yuklab oling va Android telefonga o‘rnating.
 
+Bu birinchi OTA-enabled APK bo‘ladi. Telefonda mavjud eski APK’ni bunisi bilan bir marta yangilang. Keyin `mobile/App.tsx` ichidagi JavaScript/React Native interfeys o‘zgarishlarini EAS Update orqali chiqarish mumkin:
+
+```powershell
+cd "C:\Users\User\Documents\ChatGPT\Xabarim Mobile\mobile"
+npx eas-cli@latest update --channel preview --message "Qisqa o‘zgarish tavsifi"
+```
+
+Ilovani keyingi ishga tushirishda OTA yangilanishini tekshiradi; yuklangan versiya keyingi ochishda faollashadi. Production’ga chiqarishdan oldin kodni `production` kanali uchun yaratilgan build’da tekshiring, so‘ng `--channel production` ga e’lon qiling.
+
+OTA нь JavaScript болон дэмжигдсэн asset өөрчлөлтөд зориулагдсан. Native module, permission, app icon, Expo SDK эсвэл бусад native тохиргоо өөрчлөгдвөл шинэ APK/AAB build үүсгэж тараах хэрэгтэй. OTA-г идэвхжүүлэхээс өмнө суулгасан APK шинэ `expo-updates` тохиргоог агуулаагүй тул OTA авахын тулд дээрх шинэ APK-г нэг удаа суулгана.
+
 ## 7. Play Store uchun AAB yaratish
 
 Play Store’ga yuklash uchun:
@@ -101,6 +112,7 @@ Terminaldagi QR kodni telefondagi Expo Go ilovasi bilan skaner qiling. Telefon v
 - Mobil ilova yuklaydigan sayt: `https://www.xabarim.uz/pages/app.html`
 - APK profili: `preview`
 - Play Store profili: `production`
+- OTA kanallari: `preview` va `production`
 
 ## Muammolar bo‘lsa
 

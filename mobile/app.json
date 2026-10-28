@@ -3,6 +3,9 @@
     "name": "Xabarim",
     "slug": "xabarim-mobile",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "scheme": "xabarim",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -35,6 +38,11 @@
       "eas": {
         "projectId": "58c7c926-0fd6-48a0-8898-f150ecf4f446"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/58c7c926-0fd6-48a0-8898-f150ecf4f446",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
     },
     "owner": "ahmedov.provides"
   }
