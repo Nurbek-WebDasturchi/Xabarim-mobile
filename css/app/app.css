@@ -1,0 +1,143 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  height: 100%;
+}
+body.landing-page {
+  min-height: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-text-size-adjust: 100%;
+}
+.dark-mode {
+  background-color: #0b1220;
+  color: #e7edf8;
+}
+/* Mavzu tugmasi: o'ng yuqori burchak, bosish uchun qulay maydon */
+#mode-icon {
+  position: fixed;
+  top: max(6px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+#mode-icon:hover {
+  background-color: rgba(127, 127, 150, 0.18);
+}
+#mode-icon:focus-visible {
+  outline: 2px solid #1877f2;
+  outline-offset: 2px;
+}
+
+/* Sahifa ekran balandligiga moslashadi; sig'masa tabiiy ravishda scroll bo'ladi (hech narsa kesilmaydi) */
+.landing {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(56px + env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+}
+.landing-body {
+  flex: 1;
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2vh, 16px);
+  padding-block: clamp(8px, 3vh, 32px);
+  text-align: center;
+}
+.main-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.logo {
+  height: clamp(110px, 30vh, 250px);
+  width: auto;
+  max-width: 62vw;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+.landing h1 {
+  margin: 0;
+  font-size: clamp(1.9rem, 1.2rem + 2.2vw, 2.6rem);
+  font-weight: 700;
+}
+.tagline {
+  max-width: 40ch;
+  margin: 0;
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+  line-height: 1.45;
+  text-wrap: balance;
+}
+.start-message__btn {
+  display: inline-block;
+  width: min(100%, 320px);
+  margin-top: clamp(8px, 2vh, 20px);
+  padding: 12px 20px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #3189ff, #1877f2);
+  box-shadow: 0 10px 24px -10px rgba(24, 119, 242, 0.8);
+  color: #fff;
+  font-size: clamp(1.15rem, 1rem + 0.6vw, 1.5rem);
+  text-align: center;
+  text-decoration: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+.start-message__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -10px rgba(24, 119, 242, 0.9);
+  color: #fff;
+}
+.start-message__btn:active {
+  transform: scale(0.97);
+}
+footer {
+  width: 100%;
+  padding: 14px 0 calc(14px + env(safe-area-inset-bottom));
+}
+footer p {
+  margin: 0;
+  font-size: 0.85rem;
+  text-align: center;
+}
+/* Past ekranlar (kichik noutbuk oynasi, telefon yotiq holatda) */
+@media (max-height: 560px) {
+  .landing {
+    padding-top: calc(48px + env(safe-area-inset-top));
+  }
+  .logo {
+    height: clamp(84px, 24vh, 130px);
+  }
+  .landing-body {
+    gap: 6px;
+    padding-block: 6px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .start-message__btn,
+  #mode-icon {
+    transition: none;
+  }
+}

@@ -1,0 +1,83 @@
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.login__box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  position: relative;
+  backdrop-filter: blur(6px);
+  padding: 12px;
+}
+.dark-input {
+  color: white !important;
+}
+
+.light-input {
+  color: black !important;
+}
+
+.dark-label {
+  color: white !important;
+}
+
+.light-label {
+  color: black !important;
+}
+.sign-up {
+  background-color: #4f46e5;
+  border: 1px solid #4f46e5;
+  border-radius: 9px;
+  padding: 12px;
+  color: aliceblue;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.google-icon {
+  height: 20px;
+}
+.input__box {
+  width: 100%;
+  margin-top: 5px;
+}
+/* RESPONSIVE */
+/* Mobile */
+@media (max-width: 767px) {
+  #login__box {
+    width: 100% !important;
+  }
+}
+
+/* Laptop */
+@media (min-width: 768px) and (max-width: 1199px) {
+  #login__box {
+    width: 400px;
+    box-shadow: 0 0 15px 5px rgba(13, 109, 252, 0.4);
+    padding: 30px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1200px) {
+  #login__box {
+    width: 400px;
+    box-shadow: 0 0 15px 5px rgba(13, 109, 252, 0.4);
+    padding: 30px;
+  }
+}
+/* tools */
+.hide {
+  display: none;
+}
+.red {
+  border: 2px solid red;
+}
+.dark-mode {
+  background-color: #212121;
+  color: white;
+}

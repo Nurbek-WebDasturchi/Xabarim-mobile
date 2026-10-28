@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset 
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+  http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Asosiy sahifa -->
+  <url>
+    <loc>https://xabarim.uz/</loc>
+    <lastmod>2025-10-21</lastmod>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- API sahifasi -->
+  <url>
+    <loc>https://xabarim.uz/pages/api.html</loc>
+    <lastmod>2025-10-21</lastmod>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Server sahifasi -->
+  <url>
+    <loc>https://xabarim.uz/pages/server-side.html</loc>
+    <lastmod>2025-10-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Login sahifasi -->
+  <url>
+    <loc>https://xabarim.uz/pages/login.html</loc>
+    <lastmod>2025-10-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Ro‘yxatdan o‘tish sahifasi -->
+  <url>
+    <loc>https://xabarim.uz/pages/registration.html</loc>
+    <lastmod>2025-10-21</lastmod>
+    <priority>0.7</priority>
+  </url>
+
+</urlset>

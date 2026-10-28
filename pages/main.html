@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#4f46e5" />
+    <title>Xabarim</title>
+    <script>
+      document.documentElement.setAttribute(
+        "data-bs-theme",
+        localStorage.getItem("mode") === "dark" ? "dark" : "light",
+      );
+      document
+        .querySelector('meta[name="theme-color"]')
+        .setAttribute(
+          "content",
+          localStorage.getItem("mode") === "dark" ? "#111111" : "#4f46e5",
+        );
+    </script>
+    <link rel="icon" href="../img/logos/logo-main.jpg" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <link rel="stylesheet" href="/css/spinner.css" />
+    <link rel="stylesheet" href="/css/app/main.css" />
+  </head>
+  <body>
+    <div class="app-splash" id="app-splash" role="status" aria-live="polite">
+      <img src="/img/logos/xabarim_logo.svg" alt="" />
+      <strong>Xabarim</strong>
+      <span class="app-splash__spinner" aria-hidden="true"></span>
+    </div>
+    <div class="app">
+      <header>
+        <nav class="nav-md nav-md__light">
+          <div class="nav-left">
+            <!-- <button
+              class="navbar-btn notification-trigger"
+              id="notifications-btn"
+              aria-label="Bildirishnomalar"
+              title="Bildirishnomalar">
+              <i class="bi bi-bell-fill"></i>
+              <span
+                class="notification-indicator hide"
+                id="notification-indicator"
+                ><span
+                  class="notification-preview"
+                  id="notification-preview"></span
+                ><span class="notification-dot"></span
+              ></span>
+            </button> -->
+            <img class="logo-title-img" src="/img/logos/xabarim_logo.svg" alt="" aria-hidden="true" />
+            <span class="nav-brand-title">Xabarim</span>
+          </div>
+          <div class="navbar-btns">
+            <button
+              class="navbar-btn notification-trigger"
+              id="notifications-btn"
+              aria-label="Bildirishnomalar"
+              title="Bildirishnomalar">
+              <i class="bi bi-bell-fill"></i>
+              <span
+                class="notification-indicator hide"
+                id="notification-indicator"
+                ><span
+                  class="notification-preview"
+                  id="notification-preview"></span
+                ><span class="notification-dot"></span
+              ></span>
+            </button>
+            <button
+              class="navbar-btn"
+              id="theme-toggle"
+              type="button"
+              aria-label="Toggle color theme"
+              title="Toggle color theme">
+              <i class="bi bi-moon-stars-fill" aria-hidden="true"></i>
+            </button>
+            <button
+              class="navbar-btn"
+              id="btn-settings"
+              aria-label="Settings">
+              <i class="bi bi-gear-fill"></i>
+            </button>
+            <button class="navbar-btn desktop-icon" id="btn-profile">
+              <img
+                class="nav-av"
+                id="nav-av"
+                src="/img/user-profile.svg"
+                alt="" /><span data-i18n="profile"></span>
+            </button>
+          </div>
+        </nav>
+      </header>
+      <main class="app-main container-fluid px-0" id="main">
+        <aside class="desktop-feed-nav" aria-label="Asosiy navigatsiya">
+          <a class="desktop-feed-brand" href="/pages/main.html"><img class="desktop-feed-logo" src="/img/logos/xabarim_logo.svg" alt="" /><span>Xabarim</span></a>
+          <nav class="desktop-feed-links">
+            <button type="button" class="on" data-tab="posts"><i class="bi bi-house-door-fill"></i><span data-i18n="posts"></span></button>
+            <button type="button" data-tab="friends"><i class="bi bi-compass"></i><span data-i18n="friends"></span></button>
+            <button type="button" data-tab="notifications"><span class="desktop-nav-icon"><i class="bi bi-bell"></i><span class="desktop-nav-badge hide" id="desktop-notification-unread" aria-hidden="true"></span></span><span data-i18n="notifications"></span></button>
+            <button type="button" data-tab="chats"><span class="desktop-nav-icon"><i class="bi bi-chat-dots-fill"></i><span class="desktop-nav-badge hide" id="desktop-chat-unread" aria-hidden="true"></span></span><span data-i18n="chats"></span></button>
+            <button type="button" data-tab="communities"><i class="bi bi-globe-central-south-asia"></i><span data-i18n="communities"></span></button>
+            <button type="button" id="desktop-feed-saved"><i class="bi bi-bookmark-fill"></i><span data-i18n="saved_msgs"></span></button>
+            <button type="button" id="desktop-feed-profile"><i class="bi bi-person"></i><span data-i18n="profile"></span></button>
+          </nav>
+          <div class="desktop-feed-tools" aria-label="Ko‘rinish va sozlamalar">
+            <button type="button" id="desktop-theme-toggle" aria-label="Rang rejimini almashtirish" title="Rang rejimini almashtirish"><i class="bi bi-moon-stars-fill" aria-hidden="true"></i><span>Rang rejimi</span></button>
+            <button type="button" id="desktop-btn-settings" aria-label="Sozlamalar" title="Sozlamalar"><i class="bi bi-gear-fill" aria-hidden="true"></i><span data-i18n="settings"></span></button>
+          </div>
+          <button type="button" class="desktop-feed-compose" id="desktop-new-post" data-i18n="post_action"></button>
+          <button type="button" class="desktop-feed-account" id="desktop-feed-account" aria-label="Profilni ochish"><img id="desktop-feed-avatar" src="/img/user-profile.svg" alt=""><span><b id="desktop-feed-name">Xabarim</b><small id="desktop-feed-username"></small></span><i class="bi bi-three-dots"></i></button>
+        </aside>
+        <section class="selected-chat">
+          <div class="empty" id="empty">
+            <img src="/img/icons/empty-icon.png" alt="Xabarim" />
+            <h4 data-i18n="empty"></h4>
+            <section class="notification-empty hide" id="notification-empty" aria-labelledby="notification-empty-title">
+              <span class="notification-empty__icon"><i class="bi bi-bell" aria-hidden="true"></i></span>
+              <h2 id="notification-empty-title" data-i18n="notification_empty_title"></h2>
+              <p data-i18n="notification_empty_copy"></p>
+              <div class="notification-empty__tip"><i class="bi bi-lightning-charge-fill" aria-hidden="true"></i><span data-i18n="notification_empty_tip"></span></div>
+              <button type="button" class="notification-empty__action" id="notification-feed-cta" data-i18n="notification_empty_action"></button>
+            </section>
+          </div>
+          <div class="selected hide" id="feed">
+            <div class="chat-header">
+              <button class="icon-btn back" id="feed-back" aria-label="Back">
+                <i class="bi bi-arrow-left"></i>
+              </button>
+              <h5 class="mb-0 feed-title" data-i18n="posts"></h5>
+              <div class="feed-tabs" id="feed-tabs">
+                <button data-mode="all" class="on"><i class="bi bi-globe2" aria-hidden="true"></i><span data-i18n="feed_global"></span></button>
+                <button data-mode="following"><i class="bi bi-people-fill" aria-hidden="true"></i><span data-i18n="feed_following"></span></button>
+                <button data-mode="trending"><i class="bi bi-fire" aria-hidden="true"></i><span data-i18n="feed_trending"></span></button>
+              </div>
+              <div class="feed-header-actions">
+                <button class="feed-header-link" id="desktop-chats-link" type="button" data-tab="chats">
+                  <i class="bi bi-chat-dots-fill" aria-hidden="true"></i>
+                  <span data-i18n="chats"></span>
+                </button>
+                <button class="icon-btn feed-create-btn" id="new-post" aria-label="Post joylash" title="Post joylash">
+                  <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                  <span data-i18n="post_action"></span>
+                </button>
+              </div>
+            </div>
+            <div class="feed-user-bar hide" id="feed-user-bar">
+              <button
+                class="icon-btn"
+                id="feed-user-close"
+                type="button"
+                aria-label="Back">
+                <i class="bi bi-arrow-left"></i>
+              </button>
+              <span id="feed-user-title"></span>
+            </div>
+            <div class="feed-list" id="feed-list"></div>
+          </div>
+          <div class="selected hide" id="room">
+            <div class="chat-header">
+              <button class="icon-btn back" id="back" aria-label="Back">
+                <i class="bi bi-arrow-left"></i>
+              </button>
+              <div class="peer" id="peer-open">
+                <img id="peer-av" src="/img/user-profile.svg" alt="" />
+                <div class="header-info">
+                  <h5 id="peer-name"></h5>
+                  <div class="network-status" id="peer-status"></div>
+                </div>
+              </div>
+              <div class="dropdown hide ms-auto" id="chat-menu-wrap">
+                <button
+                  class="icon-btn"
+                  type="button"
+                  id="chat-menu"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  aria-label="Chat options">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <button
+                      class="dropdown-item"
+                      type="button"
+                      id="cm-wallpaper"></button>
+                  </li>
+                  <li><hr class="dropdown-divider" id="cm-wp-divider" /></li>
+                  <li class="hide">
+                    <button
+                      class="dropdown-item text-danger"
+                      type="button"
+                      id="cm-saved-clear"></button>
+                  </li>
+                  <li class="hide">
+                    <hr class="dropdown-divider" id="cm-saved-divider" />
+                  </li>
+                  <li>
+                    <button
+                      class="dropdown-item"
+                      type="button"
+                      id="cm-friend"></button>
+                  </li>
+                  <li>
+                    <button
+                      class="dropdown-item"
+                      type="button"
+                      id="cm-follow"></button>
+                  </li>
+                  <li>
+                    <button
+                      class="dropdown-item"
+                      type="button"
+                      id="cm-clear"></button>
+                  </li>
+                  <li>
+                    <button
+                      class="dropdown-item text-danger"
+                      type="button"
+                      id="cm-delete"></button>
+                  </li>
+                  <li><hr class="dropdown-divider" id="cm-block-divider" /></li>
+                  <li>
+                    <button
+                      class="dropdown-item text-danger"
+                      type="button"
+                      id="cm-ban-user"></button>
+                  </li>
+                  <li>
+                    <button
+                      class="dropdown-item text-danger"
+                      type="button"
+                      id="cm-block"></button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="chat-body" id="chat-body"></div>
+            <div class="block-banner hide" id="block-banner">
+              <span data-i18n="blocked_banner"></span>
+              <button
+                type="button"
+                id="banner-unblock"
+                data-i18n="unblock_user"></button>
+            </div>
+            <div class="reply-preview hide" id="reply-preview">
+              <span id="reply-preview-text"></span
+              ><button
+                class="icon-btn"
+                id="reply-cancel"
+                aria-label="Cancel reply">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+            <div class="room-readonly-banner hide" id="room-readonly-banner" data-i18n="community_read_only"></div>
+            <div class="input-box">
+              <button class="icon-btn" id="attach" aria-label="Attach">
+                <i class="bi bi-paperclip"></i>
+              </button>
+              <input type="file" id="file" hidden />
+              <div
+                class="mention-suggestions"
+                id="mention-suggestions"
+                role="listbox"
+                aria-label="Mention qilinadigan foydalanuvchilar"
+                hidden></div>
+              <input
+                type="text"
+                class="message-input"
+                id="msg"
+                data-i18n-ph="msg_ph"
+                autocomplete="off"
+                enterkeyhint="send"
+                maxlength="4000" />
+              <button
+                class="send-btn mic-btn"
+                id="mic"
+                type="button"
+                aria-label="Ovozli xabar">
+                <i class="bi bi-mic-fill"></i>
+              </button>
+              <button class="send-btn hide" id="send" aria-label="Send">
+                <i class="bi bi-send-fill"></i>
+              </button>
+              <div
+                class="rec-bar"
+                id="rec-bar"
+                role="status"
+                aria-live="polite">
+                <button
+                  class="icon-btn rec-cancel"
+                  id="rec-cancel"
+                  type="button"
+                  aria-label="Bekor qilish">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+                <span class="rec-dot" aria-hidden="true"></span>
+                <span class="rec-time" id="rec-time">0:00</span>
+                <span class="rec-wave" aria-hidden="true"></span>
+                <button
+                  class="send-btn"
+                  id="rec-send"
+                  type="button"
+                  aria-label="Yuborish">
+                  <i class="bi bi-send-fill"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <aside class="chat-sidebar">
+          <div class="search-box" id="search-box">
+            <div class="search-field">
+              <button type="button" class="search-field__back" id="search-back" aria-label="Back"><i class="bi bi-arrow-left"></i></button>
+              <i class="bi bi-search search-field__ic" aria-hidden="true"></i>
+              <input type="search" id="search" data-i18n-ph="search" autocomplete="off" />
+              <button type="button" class="search-field__clear hide" id="search-clear" aria-label="Clear"><i class="bi bi-x-circle-fill"></i></button>
+            </div>
+            <div class="search-history hide" id="search-history"></div>
+          </div>
+          <div class="tabs" id="tabs">
+            <button data-tab="chats" class="tab-chat-button">
+              <span class="tab-icon-wrap"
+                ><i class="bi bi-person-fill"></i
+                ><span class="section-unread-badge hide" id="tab-chat-unread"
+                  >0</span
+                ></span
+              ><span data-i18n="personal_chats"></span>
+            </button>
+            <button data-tab="groups">
+              <span class="tab-icon-wrap"><i class="bi bi-people-fill"></i><span class="section-unread-badge hide" id="tab-group-unread">0</span></span><span data-i18n="groups"></span>
+            </button>
+            <button
+              type="button"
+              class="search-toggle"
+              id="search-toggle"
+              aria-label="Search"
+              aria-expanded="false">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+          <div
+            class="chat-categories"
+            id="chat-categories"
+            aria-label="Message categories">
+            <button type="button" data-chat-tab="chats">
+              <i class="bi bi-person-fill"></i
+              ><span data-i18n="personal_chats"></span>
+            </button>
+            <button type="button" data-chat-tab="groups">
+              <i class="bi bi-people-fill"></i><span data-i18n="groups"></span>
+            </button>
+          </div>
+          <div class="notes" id="notes"></div>
+          <div class="notification-list hide" id="notification-list"></div>
+          <ul class="chat-list" id="list"></ul>
+        </aside>
+        <nav class="nav-mobile" id="nav-mobile">
+          <button type="button" data-tab="posts">
+            <i class="bi bi-house-door-fill"></i><span data-i18n="posts"></span>
+          </button>
+          <button type="button" data-tab="friends">
+            <i class="bi bi-person-lines-fill"></i
+            ><span data-i18n="friends"></span>
+          </button>
+          <button type="button" data-tab="chats" class="tab-chat-button">
+            <span class="tab-icon-wrap"
+              ><i class="bi bi-chat-dots-fill"></i
+              ><span class="section-unread-badge hide" id="nav-chat-unread"
+                >0</span
+              ></span
+            ><span data-i18n="chats"></span>
+          </button>
+          <button type="button" data-tab="communities">
+            <i class="bi bi-globe-central-south-asia"></i><span data-i18n="communities"></span>
+          </button>
+          <button type="button" id="n-profile" aria-label="Profile">
+            <img
+              class="nav-mobile-avatar"
+              id="nav-mobile-av"
+              src="/img/user-profile.svg"
+              alt="" />
+            <span data-i18n="profile"></span>
+          </button>
+        </nav>
+      </main>
+    </div>
+
+    <!-- My profile -->
+    <div class="modal fade" id="profile-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" data-i18n="profile"></h5>
+            <button
+              class="btn-close ms-auto"
+              aria-label="Profil oynasini yopish"
+              type="button"
+              data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="my-profile-hero">
+              <button
+                class="icon-btn profile-edit-trigger"
+                id="p-edit"
+                type="button"
+                aria-label="Profilni tahrirlash"
+                title="Tahrirlash">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <div class="avatar-wrap">
+                <img id="p-av" src="/img/user-profile.svg" alt="" />
+                <label class="hide" for="p-file" title="Change photo"
+                  ><i class="bi bi-camera-fill"></i
+                ></label>
+                <input
+                  type="file"
+                  id="p-file"
+                  accept="image/*"
+                  hidden
+                  disabled />
+              </div>
+              <h3 id="p-display-name" class="profile-display-name"></h3>
+              <div id="p-display-user" class="profile-display-user"></div>
+              <div class="profile-online">
+                <i class="bi bi-circle-fill"></i> online
+              </div>
+            </div>
+            <section
+              id="avatar-crop"
+              class="avatar-crop hide"
+              aria-label="Profil rasmini rostlash">
+              <p class="small text-center mb-2" data-i18n="crop_hint"></p>
+              <div class="avatar-crop-stage" id="avatar-crop-stage">
+                <img id="avatar-crop-image" alt="" />
+              </div>
+              <label
+                class="small d-block mt-3"
+                for="avatar-crop-zoom"
+                data-i18n="crop_zoom"></label>
+              <input
+                id="avatar-crop-zoom"
+                class="form-range"
+                type="range"
+                min="1"
+                max="3"
+                step="0.01"
+                value="1" />
+              <div class="d-flex justify-content-end gap-2 mt-2">
+                <button
+                  class="btn btn-outline-secondary"
+                  id="avatar-crop-cancel"
+                  type="button"
+                  data-i18n="cancel"></button>
+                <button
+                  class="btn-brand"
+                  id="avatar-crop-apply"
+                  type="button"
+                  data-i18n="crop_apply"></button>
+              </div>
+            </section>
+            <div class="follow-stats" id="p-stats">
+              <button type="button" data-kind="followers">
+                <b id="p-followers">0</b><span data-i18n="followers"></span>
+              </button>
+              <button type="button" data-kind="following">
+                <b id="p-following">0</b><span data-i18n="following"></span>
+              </button>
+            </div>
+            <div class="profile-edit-fields">
+              <label
+                class="form-label small"
+                for="p-name"
+                data-i18n="name"></label>
+              <input
+                class="form-control mb-2 profile-view-field"
+                id="p-name"
+                maxlength="50"
+                disabled />
+              <label
+                class="form-label small"
+                for="p-user"
+                data-i18n="username"></label>
+              <input
+                class="form-control mb-2 profile-view-field"
+                id="p-user"
+                maxlength="30"
+                autocapitalize="none"
+                disabled />
+              <label
+                class="form-label small"
+                for="p-bio"
+                data-i18n="bio"></label>
+              <textarea
+                class="form-control mb-2 profile-view-field"
+                id="p-bio"
+                rows="2"
+                maxlength="160"
+                data-i18n-ph="bio_ph"
+                disabled></textarea>
+            </div>
+            <section class="xcoin-panel" aria-label="XCoin balansi">
+              <div class="xcoin-balance">
+                <span><i class="bi bi-coin"></i> XCoin balans</span
+                ><strong
+                  ><span id="p-xcoin">0</span> <small>XCoin</small></strong
+                >
+              </div>
+              <button
+                class="earn-xcoin-btn"
+                id="p-xcoin-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="p-xcoin-tasks"
+                data-i18n="earn_xcoin">
+                Earn XCoin
+              </button>
+              <button
+                class="earn-xcoin-btn xcoin-send-btn"
+                id="p-xcoin-send-open"
+                type="button"
+                data-i18n="send_xcoin">
+                XCoin yuborish
+              </button>
+              <div class="xcoin-tasks" id="p-xcoin-tasks" hidden>
+                <div class="xcoin-task">
+                  <span class="xcoin-task-icon"
+                    ><i class="fi fi-rr-user-add"></i></span
+                  ><span class="xcoin-task-copy"
+                    ><b data-i18n="invite_task_title">Do‘stingizni taklif qiling</b
+                    ><small data-i18n="invite_task_hint">Ro‘yxatdan o‘tgan har bir do‘st uchun</small></span
+                    ><strong>+1</strong>
+                  <div class="xcoin-link-row">
+                    <code id="p-referral-link"></code
+                    ><button
+                      class="icon-btn"
+                      id="p-copy-referral"
+                      type="button"
+                      aria-label="Taklif havolasini nusxalash">
+                      <i class="fi fi-rr-copy"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="xcoin-task telegram-xcoin-task"
+                  ><span class="xcoin-task-icon"
+                    ><i class="fi fi-rr-paper-plane"></i></span
+                  ><span class="xcoin-task-copy"
+                    ><b data-i18n="telegram_task_title">Telegram kanaliga qo‘shiling</b
+                    ><small data-i18n="telegram_task_hint">Xabarim yangiliklarini kuzating</small></span
+                  ><strong>+5</strong>
+                  <div class="xcoin-link-row telegram-task-actions">
+                    <a class="btn btn-sm btn-outline-primary" href="https://t.me/ahmedov_2604" target="_blank" rel="noopener" data-i18n="telegram_join">Kanalga qo‘shilish</a>
+                    <button class="btn btn-sm btn-brand" id="p-telegram-claim" type="button" data-i18n="telegram_check">Tekshirish</button>
+                  </div>
+                  <button class="btn btn-sm btn-outline-primary telegram-link-btn" id="p-telegram-link" type="button" data-i18n="telegram_link">Telegram hisobini ulash</button>
+                  <small class="telegram-linked-status" id="p-telegram-linked" data-i18n="telegram_linked" hidden>Telegram hisobi ulangan</small>
+                  <div id="telegram-login-container" class="telegram-login-container" hidden></div>
+                </div>
+                >
+              </div>
+            </section>
+            <section class="premium-panel" id="p-premium-panel">
+              <div>
+                <div class="xcoin-section-title">
+                  <i class="bi bi-patch-check-fill"></i> Xabarim Premium
+                </div>
+                <p class="xcoin-note">
+                  Premium belgi, kengaytirilgan imkoniyatlar va profil uchun
+                  maxsus ko‘rinish.
+                </p>
+              </div>
+              <button class="btn-brand" id="p-buy-premium" type="button">
+                50 XCoin
+              </button>
+              <p class="premium-dates" id="p-premium-dates" hidden></p>
+              <p class="premium-hint">
+                Premium uchun 50 XCoin kerak. Har bir taklif 1 XCoin beradi.
+              </p>
+            </section>
+            <div class="profile-verification-actions">
+              <div id="p-human-status" class="profile-human-status"></div>
+              <button
+                class="btn btn-sm btn-outline-primary p-google-link"
+                id="p-google-link"
+                type="button">
+                <i class="bi bi-google"></i> Google hisobini ulash
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger p-google-unlink"
+                id="p-google-unlink"
+                type="button">
+                <i class="bi bi-unlink"></i> Google hisobini uzish
+              </button>
+            </div>
+            <h6 class="account-posts-title">Postlarim</h6>
+            <div class="account-posts" id="my-account-posts"></div>
+          </div>
+          <div class="modal-footer border-0 justify-content-end">
+            <button
+              class="btn btn-outline-secondary hide"
+              id="p-cancel"
+              type="button">
+              Bekor qilish
+            </button>
+            <button
+              class="btn-brand hide"
+              id="p-save"
+              data-i18n="save"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="xcoin-send-modal"
+      tabindex="-1"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" data-i18n="send_xcoin"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"></button>
+          </div>
+          <form id="xcoin-send-form">
+            <div class="modal-body pt-0">
+              <label
+                class="form-label"
+                for="xcoin-recipient"
+                data-i18n="recipient_username"></label>
+              <input
+                class="form-control mb-3"
+                id="xcoin-recipient"
+                maxlength="30"
+                autocomplete="off"
+                autocapitalize="none"
+                required
+                placeholder="@username" />
+              <label
+                class="form-label"
+                for="xcoin-amount"
+                data-i18n="xcoin_amount"></label>
+              <input
+                class="form-control"
+                id="xcoin-amount"
+                type="number"
+                min="1"
+                step="1"
+                inputmode="numeric"
+                required />
+            </div>
+            <div class="modal-footer border-0">
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                data-bs-dismiss="modal"
+                data-i18n="cancel"></button
+              ><button
+                class="btn-brand"
+                id="xcoin-send-submit"
+                type="submit"
+                data-i18n="send"></button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="google-offer-modal"
+      tabindex="-1"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content google-offer-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title">
+              <i class="bi bi-shield-check"></i> Haqiqiy inson ekaningizni
+              tasdiqlang
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Yopish"></button>
+          </div>
+          <div class="modal-body pt-0">
+            <p>
+              Google hisobingizni ulaysizmi? Faqat haqiqiy
+              <b>gmail.com</b> hisobi qabul qilinadi.
+            </p>
+            <ul>
+              <li>Profilingizda “Haqiqiy inson” maqomi chiqadi</li>
+              <li>Darhol 10 XCoin olasiz</li>
+              <li>Xabarim Premiumga obuna bo‘lish osonlashadi</li>
+              <li>
+                Ishonchli akkaunt sifatida ko‘proq imkoniyatlarga ega bo‘lasiz
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer border-0">
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              data-bs-dismiss="modal">
+              Hozir emas</button
+            ><button class="btn-brand" id="google-offer-link" type="button">
+              <i class="bi bi-google"></i> Gmail ulash
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Peer profile -->
+    <div class="modal fade" id="peer-modal" tabindex="-1" aria-hidden="true">
+      <div
+        class="modal-dialog modal-dialog-centered modal-lg peer-profile-dialog">
+        <div class="modal-content text-center">
+          <div class="modal-header border-0">
+            <button
+              type="button"
+              class="btn-close ms-auto"
+              data-bs-dismiss="modal"></button>
+            <div class="dropdown ms-2" id="group-menu-wrap">
+              <button
+                class="icon-btn"
+                type="button"
+                id="group-menu"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Group options">
+                <i class="bi bi-three-dots-vertical"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <button class="dropdown-item text-danger" id="report-group">
+                    <i class="bi bi-flag me-2"></i
+                    ><span data-i18n="report_group"></span>
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item text-danger hide" id="leave">
+                    <i class="bi bi-box-arrow-right me-2"></i
+                    ><span data-i18n="leave"></span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="dropdown-item text-danger hide"
+                    id="delete-group">
+                    <i class="bi bi-trash me-2"></i>Guruhni o‘chirish
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="modal-body pt-0">
+            <div class="peer-profile-layout">
+              <section class="peer-profile-side">
+                <div class="peer-identity">
+                  <div class="avatar-wrap">
+                    <img id="pm-av" src="/img/user-profile.svg" alt="" />
+                  </div>
+                  <div class="peer-identity-copy">
+                    <h5 id="pm-name"></h5>
+                    <div id="pm-user" class="peer-username"></div>
+                  </div>
+                </div>
+                <div class="follow-stats hide" id="pm-stats">
+                  <button type="button" data-kind="followers">
+                    <b id="pm-followers">0</b
+                    ><span data-i18n="followers"></span>
+                  </button>
+                  <button type="button" data-kind="following">
+                    <b id="pm-following">0</b
+                    ><span data-i18n="following"></span>
+                  </button>
+                </div>
+                <div class="peer-actions">
+                  <button
+                    class="peer-message-btn hide"
+                    id="pm-message"
+                    type="button">
+                    <i class="bi bi-chat-left-text"></i
+                    ><span data-i18n="msg_ph"></span>
+                  </button>
+                  <button
+                    class="peer-follow-btn hide"
+                    id="pm-follow"
+                    type="button"></button>
+                </div>
+                <div class="peer-info-block" id="pm-bio-block">
+                  <div class="peer-info-label" data-i18n="bio"></div>
+                  <p id="pm-bio" class="peer-bio"></p>
+                </div>
+                <div class="peer-info-block" id="pm-note-block">
+                  <div class="peer-info-label" data-i18n="note"></div>
+                  <p id="pm-note" class="peer-note"></p>
+                </div>
+              </section>
+              <section class="peer-profile-content">
+                <div class="group-details hide" id="group-details">
+                  <div class="group-detail-row">
+                    <span data-i18n="members"></span
+                    ><b id="pm-group-members">0</b>
+                  </div>
+                  <div class="group-detail-row">
+                    <span data-i18n="group_username"></span
+                    ><b id="pm-group-username"></b>
+                  </div>
+                  <div class="group-invite">
+                    <div>
+                      <small data-i18n="invite_link"></small
+                      ><code id="pm-group-link"></code>
+                    </div>
+                    <button
+                      class="group-link-btn"
+                      id="pm-copy-link"
+                      aria-label="Copy invite link">
+                      <i class="bi bi-copy"></i>
+                    </button>
+                  </div>
+                </div>
+                <h6 class="account-posts-title" id="peer-posts-title">
+                  Postlari
+                </h6>
+                <div class="account-posts" id="peer-account-posts"></div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="people-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title" id="people-title"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"></button>
+          </div>
+          <div class="feed-tabs" id="people-tabs">
+            <button
+              data-kind="followers"
+              class="on"
+              data-i18n="followers"></button>
+            <button data-kind="following" data-i18n="following"></button>
+          </div>
+          <div class="modal-body pt-2 people-list" id="people-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="report-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" id="report-modal-title" data-i18n="report_group"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <label
+              class="form-label"
+              for="report-reason"
+              data-i18n="report_reason"></label
+            ><select id="report-reason" class="form-select mb-3">
+              <option value="spam" data-i18n="report_spam"></option>
+              <option value="abuse" data-i18n="report_abuse"></option>
+              <option
+                value="inappropriate"
+                data-i18n="report_inappropriate"></option>
+              <option value="other" data-i18n="report_other"></option></select
+            ><textarea
+              id="report-details"
+              class="form-control"
+              rows="3"
+              maxlength="500"
+              data-i18n-ph="report_details_ph"></textarea>
+          </div>
+          <div class="modal-footer border-0">
+            <button
+              class="btn-brand"
+              id="report-submit"
+              data-i18n="send_report"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="group-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" data-i18n="new_group"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input
+              class="form-control mb-2"
+              id="g-name"
+              maxlength="60"
+              data-i18n-ph="group_name" />
+            <label
+              class="form-label small w-100 text-start"
+              for="g-username"
+              data-i18n="group_username"></label>
+            <div class="input-group mb-2">
+              <span class="input-group-text">@</span
+              ><input
+                class="form-control"
+                id="g-username"
+                maxlength="30"
+                autocapitalize="none"
+                autocomplete="off"
+                data-i18n-ph="group_username_ph" />
+            </div>
+            <textarea
+              class="form-control"
+              id="g-users"
+              rows="2"
+              data-i18n-ph="members_ph"
+              autocapitalize="none"></textarea>
+          </div>
+          <div class="modal-footer border-0">
+            <button class="btn-brand" id="g-create" data-i18n="create"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="post-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" data-i18n="new_post"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="post-compose-wrap">
+              <textarea
+                class="form-control mb-2"
+                id="post-text"
+                rows="4"
+                maxlength="2000"
+                data-i18n-ph="post_ph"></textarea>
+              <div class="mention-suggestions post-mention-suggestions" id="post-mention-suggestions" role="listbox" aria-label="Mention qilinadigan foydalanuvchilar" hidden></div>
+            </div>
+            <input
+              class="form-control"
+              type="file"
+              id="post-file"
+              accept="image/*" />
+          </div>
+          <div class="modal-footer border-0">
+            <button
+              class="btn-brand"
+              id="post-send"
+              data-i18n="publish"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="post-stats-modal"
+      tabindex="-1"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title">Post statistikasi</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"></button>
+          </div>
+          <div class="modal-body pt-0">
+            <div id="post-stats-summary" class="post-stats-summary"></div>
+            <div id="post-stats-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="action-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body pb-2">
+            <h5 class="mb-2" id="am-title"></h5>
+            <p class="mb-3 text-body-secondary" id="am-text"></p>
+            <label class="am-check hide" id="am-check-wrap">
+              <input class="form-check-input" type="checkbox" id="am-check" />
+              <span id="am-check-label"></span>
+            </label>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
+              data-i18n="cancel"></button>
+            <button type="button" class="btn btn-danger" id="am-ok"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="bg-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title" data-i18n="chat_bg"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="bgp-preview" id="bgp-preview">
+              <div class="bgp-bubble them" data-i18n="bg_preview_in"></div>
+              <div class="bgp-bubble me" data-i18n="bg_preview_out"></div>
+            </div>
+            <div class="bgp-grid" id="bgp-grid"></div>
+            <div class="bgp-dim hide" id="bgp-dim-wrap">
+              <label for="bgp-dim" data-i18n="bg_dim"></label>
+              <input
+                type="range"
+                id="bgp-dim"
+                min="0"
+                max="70"
+                step="5"
+                value="25" />
+            </div>
+            <label class="bgp-scope">
+              <input class="form-check-input" type="checkbox" id="bgp-this" />
+              <span
+                ><b data-i18n="bg_this_chat"></b
+                ><small data-i18n="bg_this_chat_hint"></small
+              ></span>
+            </label>
+            <input type="file" id="bgp-file" accept="image/*" hidden />
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button
+              type="button"
+              class="bgp-save"
+              id="bgp-save"
+              data-i18n="save"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="fwd-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title" data-i18n="forward_msg"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="fwd-preview" id="fwd-preview"></div>
+            <input
+              class="form-control mb-2"
+              id="fwd-search"
+              type="search"
+              autocomplete="off" />
+            <div class="fwd-list" id="fwd-list"></div>
+          </div>
+          <div class="modal-footer fwd-footer border-0 pt-0">
+            <label class="fwd-mode">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="fwd-mode"
+                id="fwd-author"
+                checked />
+              <span
+                ><b data-i18n="fwd_with_author"></b
+                ><small data-i18n="fwd_with_author_hint"></small
+              ></span>
+            </label>
+            <label class="fwd-mode">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="fwd-mode"
+                id="fwd-noauthor" />
+              <span
+                ><b data-i18n="fwd_no_author"></b
+                ><small data-i18n="fwd_no_author_hint"></small
+              ></span>
+            </label>
+            <button
+              type="button"
+              class="btn btn-brand w-100"
+              id="fwd-send"
+              disabled></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="msg-menu hide" id="msg-menu" role="menu"></div>
+    <div class="modal fade" id="note-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" data-i18n="add_note"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input
+              class="form-control"
+              id="n-text"
+              maxlength="60"
+              data-i18n-ph="add_note" />
+            <div class="small text-muted mt-1" data-i18n="note_hint"></div>
+          </div>
+          <div class="modal-footer border-0 justify-content-between">
+            <button
+              class="btn btn-outline-danger"
+              id="n-del"
+              data-i18n="delete"></button
+            ><button class="btn-brand" id="n-share" data-i18n="share"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="note-view-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered note-view-dialog">
+        <div class="modal-content note-view-card">
+          <div class="modal-header border-0">
+            <div class="note-view-author">
+              <img id="note-view-avatar" src="/img/user-profile.svg" alt="" />
+              <span><b id="note-view-name"></b><small data-i18n="note_view_title"></small></span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body pt-0">
+            <blockquote class="note-view-text" id="note-view-text"></blockquote>
+            <p class="note-view-reaction-label" data-i18n="note_react_prompt"></p>
+            <div class="note-view-reactions" id="note-view-reactions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="settings-modal"
+      tabindex="-1"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" data-i18n="settings"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body pt-0">
+            <button class="s-row s-me" id="s-profile">
+              <img id="s-av" src="/img/user-profile.svg" alt="" />
+              <span class="s-me-identity"
+                ><b id="s-name"></b><small id="s-user"></small
+              ></span>
+              <i class="bi bi-chevron-right s-me-chevron"></i>
+              <small id="s-human-status" class="settings-human-status"></small>
+            </button>
+            <div class="s-row">
+              <span
+                ><i class="bi bi-translate"></i>
+                <span data-i18n="language"></span></span
+              ><span id="lang-slot"></span>
+            </div>
+            <label class="s-row" for="s-dark"
+              ><span
+                ><i class="bi bi-moon-stars-fill"></i>
+                <span data-i18n="dark"></span></span
+              ><span class="form-check form-switch m-0"
+                ><input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="s-dark" /></span
+            ></label>
+            <button class="s-row s-help-link" id="settings-faq" type="button">
+              <span
+                ><i class="bi bi-question-circle"></i
+                ><span data-i18n="help_faq"></span></span
+              ><i class="bi bi-chevron-right"></i>
+            </button>
+            <button
+              class="s-row s-help-link"
+              id="settings-features"
+              type="button">
+              <span
+                ><i class="bi bi-lightbulb"></i
+                ><span data-i18n="help_features"></span></span
+              ><i class="bi bi-chevron-right"></i>
+            </button>
+            <button class="s-row s-help-link" id="settings-ask" type="button">
+              <span
+                ><i class="bi bi-chat-square-text"></i
+                ><span data-i18n="ask_question"></span></span
+              ><i class="bi bi-chevron-right"></i>
+            </button>
+            <button class="s-row text-danger" id="logout">
+              <span
+                ><i class="bi bi-box-arrow-right"></i>
+                <span data-i18n="logout"></span
+              ></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="help-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" id="help-modal-title"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"></button>
+          </div>
+          <div class="modal-body pt-0" id="help-modal-body"></div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="question-modal"
+      tabindex="-1"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" data-i18n="ask_question"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"></button>
+          </div>
+          <form id="support-question-form">
+            <div class="modal-body pt-0">
+              <p class="small text-muted" data-i18n="question_admin_note"></p>
+              <textarea
+                class="form-control"
+                id="support-question"
+                rows="5"
+                minlength="5"
+                maxlength="3000"
+                required
+                data-i18n-ph="question_ph"></textarea>
+            </div>
+            <div class="modal-footer border-0">
+              <button
+                class="btn-brand"
+                id="question-send"
+                type="submit"
+                data-i18n="send_question"></button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div
+      class="lightbox hide"
+      id="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Rasm ko‘rish">
+      <button type="button" class="lightbox-close" aria-label="Yopish">
+        <i class="bi bi-x-lg"></i>
+      </button>
+      <button
+        type="button"
+        class="lightbox-more"
+        aria-label="Menyu"
+        aria-haspopup="true"
+        aria-expanded="false">
+        <i class="bi bi-three-dots-vertical"></i>
+      </button>
+      <div class="lightbox-menu hide" role="menu">
+        <button type="button" role="menuitem" data-lb="save">
+          <i class="bi bi-download"></i><span></span>
+        </button>
+        <button type="button" role="menuitem" data-lb="fullscreen">
+          <i class="bi bi-arrows-fullscreen"></i><span></span>
+        </button>
+      </div>
+      <img alt="" />
+    </div>
+    <div id="toast" role="status"></div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/config.js" onerror="void 0"></script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/core/spin.js"></script>
+    <script src="/js/core/db.js"></script>
+    <script src="/js/app/main.js"></script>
+    <script src="/js/core/nozoom.js"></script>
+  </body>
+</html>

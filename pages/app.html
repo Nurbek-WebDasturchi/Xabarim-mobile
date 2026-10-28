@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>Welcome to Xabarim</title>
+    <link rel="icon" href="../img/logos/xabarim_logo.svg" />
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous" />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/app/app.css " />
+  </head>
+  <body class="vh-100">
+    <div
+      id="lang-slot"
+      style="position: fixed; top: 10px; left: 12px; z-index: 5"></div>
+    <div class="container-fluid p-0">
+      <div class="row m-0 p-0">
+        <div class="col-12 icon-box">
+          <i class="bi bi-moon-stars-fill" id="mode-icon"></i>
+        </div>
+        <div class="col-12 main p-3">
+          <div class="main-body mt-5">
+            <img
+              src="../img/logos/xabarim_logo.svg"
+              alt="Xabarim idea is created by Ahmedov Nurbek in 06.09.2025"
+              class="logo" />
+            <h1 class="text-center">Xabarim</h1>
+            <p class="text-center p-1" data-i18n="tagline"></p>
+          </div>
+          <div class="w-100 d-flex justify-content-center">
+            <a
+              href="./auth/registration.html"
+              class="start-message__btn"
+              data-i18n="start"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="text-secondary mb-4">
+      <p class="d-block">
+        All rights reserved. The project made by Nurbek Ahmedov
+      </p>
+    </footer>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/config.js" onerror="void 0"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/script.js"></script>
+    <script>
+      // Xush kelibsiz sahifasi faqat tizimga kirmagan foydalanuvchilarga ko‘rinadi.
+      // Supabase sessiyasi brauzerda saqlanadi, shu sabab qayta tashrifda ilovani ochamiz.
+      (async () => {
+        const config = window.XABARIM_CONFIG || {};
+        if (!config.url || !config.anonKey || !window.supabase) {
+          Lang.init();
+          return;
+        }
+        try {
+          const client = window.supabase.createClient(config.url, config.anonKey);
+          const { data: { session } } = await client.auth.getSession();
+          if (session) {
+            location.replace("/pages/main.html");
+            return;
+          }
+        } catch (error) {
+          console.warn("Xabarim sessiyasini tekshirib bo‘lmadi:", error);
+        }
+        Lang.init();
+      })();
+    </script>
+    <script src="../js/core/nozoom.js"></script>
+  </body>
+</html>

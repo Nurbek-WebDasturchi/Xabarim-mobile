@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>Xabarim</title>
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous" />
+    <!-- CSS -->
+    <link rel="stylesheet" href="./css/deadline.css" />
+    <!-- Google Fonts [Bebas Neue Static]    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Carter+One&family=Lobster&family=Tangerine&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
+    <main class="landing-shell">
+      <div class="landing-content">
+        <section class="release-box" aria-labelledby="release-title">
+          <p class="release-kicker">Xabarim</p>
+          <h1 class="release-title" id="release-title">Tez orada ishga tushiriladi</h1>
+          <div class="release-card" aria-label="Ilova ishga tushishigacha qolgan vaqt">
+            <div class="countdown-unit"><div class="number" id="day"></div><div class="date-detail">kun</div></div>
+            <div class="countdown-unit"><div class="number" id="hour"></div><div class="date-detail">soat</div></div>
+            <div class="countdown-unit"><div class="number" id="second"></div><div class="date-detail">soniya</div></div>
+          </div>
+          <p class="release-date">Mobil ilova ishga tushish sanasi: <strong>19-noyabr, 2026</strong></p>
+        </section>
+        <section class="web-launch" aria-label="Xabarim web versiyasi">
+          <div class="web-launch__copy">
+            <span class="web-launch__eyebrow">Web versiya</span>
+            <h2>Xabarim’dan hoziroq foydalaning</h2>
+            <p>Do‘stlaringiz bilan xabarlashing, postlar ulashing va Xabarim imkoniyatlarini brauzerda sinab ko‘ring.</p>
+          </div>
+          <a href="https://www.xabarim.uz/pages/app.html" class="web-launch__button">Web versiyani ochish <span aria-hidden="true">↗</span></a>
+        </section>
+      </div>
+    </main>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/config.js" onerror="void 0"></script>
+    <script>
+      (async () => {
+        const appUrl = "/pages/app.html";
+        const config = window.XABARIM_CONFIG || {};
+        if (!config.url || !config.anonKey || !window.supabase) {
+          document.querySelector(".web-launch__button").href = appUrl;
+          return;
+        }
+        try {
+          const client = window.supabase.createClient(config.url, config.anonKey);
+          const { data: { session } } = await client.auth.getSession();
+          location.replace(session ? "/pages/main.html" : appUrl);
+        } catch (error) {
+          console.warn("Xabarim sessiyasini tekshirib bo‘lmadi:", error);
+          document.querySelector(".web-launch__button").href = appUrl;
+        }
+      })();
+    </script>
+    <script src="./js/deadline.js"></script>
+    <script src="./js/core/nozoom.js"></script>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+/* Tugmadagi spinner: matn/ikonka yashirinadi, joyida aylanuvchi halqa chiqadi (tugma kengligi o'zgarmaydi) */
+@keyframes xs-rotate { to { transform: rotate(360deg); } }
+button.is-loading { position: relative; pointer-events: none; color: transparent !important; cursor: progress; }
+button.is-loading > * { visibility: hidden; }
+button.is-loading::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 1.15em; height: 1.15em; margin: -.575em 0 0 -.575em;
+  border: 2px solid var(--spin, #fff); border-right-color: transparent; border-radius: 50%;
+  animation: xs-rotate .7s linear infinite;
+}
+button.icon-btn.is-loading, button.join-btn:not(.on).is-loading, .dropdown-item.is-loading, .s-row.is-loading { --spin: var(--brand, #4f46e5); }
+/* Alohida spinner (lenta yuklanayotganda) */
+.xs-spin {
+  display: inline-block; width: 1.3em; height: 1.3em; vertical-align: -.3em;
+  border: 2px solid var(--brand, #4f46e5); border-right-color: transparent; border-radius: 50%;
+  animation: xs-rotate .7s linear infinite;
+}
+.xs-spin-lg { width: 2rem; height: 2rem; border-width: 3px; }

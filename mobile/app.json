@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Xabarim",
+    "slug": "xabarim-mobile",
+    "version": "1.0.0",
+    "scheme": "xabarim",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "defaultChannel": "messages",
+          "color": "#087EF5"
+        }
+      ]
+    ],
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "uz.xabarim.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#087EF5",
+        "foregroundImage": "./assets/icon.png"
+      },
+      "predictiveBackGestureEnabled": true
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "uz.xabarim.mobile"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "58c7c926-0fd6-48a0-8898-f150ecf4f446"
+      }
+    },
+    "owner": "ahmedov.provides"
+  }
+}

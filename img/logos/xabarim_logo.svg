@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.85" y2="1">
+      <stop offset="0%" stop-color="#18B9EA"/>
+      <stop offset="100%" stop-color="#0878F7"/>
+    </linearGradient>
+    <linearGradient id="backBubble" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#D5F5FF"/>
+      <stop offset="100%" stop-color="#61BFF2"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#0757B8" flood-opacity="0.28"/>
+    </filter>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0757B8" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <!-- Circular app badge -->
+  <circle cx="512" cy="512" r="430" fill="url(#bg)"/>
+
+  <!-- Rear chat bubble -->
+  <path
+    d="M435 690
+       C520 690 641 690 700 664
+       C765 635 800 573 800 503
+       C800 474 793 446 780 420
+       C819 454 841 505 841 561
+       C841 649 787 725 705 756
+       C649 778 578 779 493 779
+       L426 833
+       C413 843 395 834 398 817
+       L407 765
+       C390 754 375 742 362 728
+       C386 706 409 694 435 690Z"
+    fill="url(#backBubble)"
+    opacity="0.95"
+    filter="url(#softShadow)"
+  />
+
+  <!-- Main chat bubble -->
+  <path
+    d="M354 309
+       H659
+       C731 309 787 365 787 437
+       V570
+       C787 642 731 698 659 698
+       H522
+       C510 698 498 702 488 710
+       L411 774
+       C395 787 371 776 373 755
+       L380 703
+       C323 683 282 630 282 570
+       V437
+       C282 365 282 309 354 309Z"
+    fill="#FFFFFF"
+    filter="url(#shadow)"
+  />
+
+  <!-- Typing dots -->
+  <circle cx="425" cy="512" r="31" fill="#087EF5"/>
+  <circle cx="512" cy="512" r="31" fill="#087EF5"/>
+  <circle cx="599" cy="512" r="31" fill="#087EF5"/>
+</svg>
