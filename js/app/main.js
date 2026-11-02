@@ -292,6 +292,8 @@
     `<i class="st st-${stKey(m)}${pop ? " pop" : ""} bi bi-${ST[stKey(m)]}"></i>`;
   const userCard = (p, sub, time, unread, st = "") =>
     `<li class="person-card${target?.type === "user" && target.id === p.id ? " active" : ""}" data-id="${esc(p.id)}"><button class="chat-avatar" type="button" data-profile="${esc(p.id)}" aria-label="${esc(p.full_name || p.username)} profilini ochish"><img class="username-img" src="${av(p)}" alt=""><span class="avatar-loading" aria-hidden="true"></span></button><div><div class="username"><span class="username-label">${esc(p.full_name || p.username)}</span>${accountBadges(p)}</div><p class="message-text">${st}${esc(sub)}</p></div><div class="d-flex flex-column align-items-center gap-1"><span class="recieve-time">${time}</span>${unread ? `<div class="new-badge">${unread}</div>` : ""}</div></li>`;
+  const savedCard = (last) =>
+    `<li class="person-card${target?.type === "user" && target.id === me.id ? " active" : ""}" data-id="${esc(me.id)}"><span class="chat-avatar" aria-hidden="true"><img class="username-img" src="${SAVED_AV}" alt=""></span><div><div class="username"><span class="username-label">${esc(t("saved_msgs"))}</span></div><p class="message-text">${last ? esc(preview(last)) : esc(t("saved_hint"))}</p></div><div class="d-flex flex-column align-items-center gap-1"><span class="recieve-time">${last ? hm(last.created_at) : ""}</span></div></li>`;
   const roomCard = (r, extra) => {
     const m = r.kind === "group" ? r.lastMessage : null;
     const previewText = m
@@ -348,7 +350,8 @@
           : `<li class="list-empty">${t("no_results")}</li>`;
       else
         h =
-          (chats.some((c) => c.peer.id !== me.id)
+          [savedCard(chats.find((c) => c.peer.id === me.id)?.last),
+           ...(chats.some((c) => c.peer.id !== me.id)
             ? chats
                 .filter((c) => c.peer.id !== me.id)
                 .map(
@@ -365,8 +368,7 @@
                     )
                   ),
                 )
-                .join("")
-            : `<li class="list-empty">${t("no_chats")}</li>`);
+            : [])].join("");
     } else if (tab === "friends") {
       const q = $("#search").value.trim().toLocaleLowerCase();
       const list = q

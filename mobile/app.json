@@ -9,21 +9,20 @@
     "scheme": "xabarim",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
     "plugins": [
-      [
-        "expo-notifications",
-        {
-          "defaultChannel": "messages",
-          "color": "#087EF5"
-        }
-      ]
+      "expo-router",
+      "expo-secure-store",
+      "expo-video"
     ],
-    "userInterfaceStyle": "light",
+    "experiments": {
+      "typedRoutes": true
+    },
     "android": {
       "package": "uz.xabarim.mobile",
       "adaptiveIcon": {
-        "backgroundColor": "#087EF5",
-        "foregroundImage": "./assets/icon.png"
+        "backgroundColor": "#5848E8",
+        "foregroundImage": "./assets/android-icon-foreground.png"
       },
       "predictiveBackGestureEnabled": true
     },

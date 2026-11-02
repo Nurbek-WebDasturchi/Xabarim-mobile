@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "xabarim",
-    "slug": "xabarim",
+    "name": "Xabarim",
+    "slug": "xabarim-mobile-native",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -11,11 +11,10 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "uz.xabarim.mobile",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#5848E8",
+        "foregroundImage": "./assets/images/icon.png"
       },
       "predictiveBackGestureEnabled": false
     },
@@ -25,6 +24,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-secure-store",
       [
         "expo-splash-screen",
         {
@@ -34,6 +34,11 @@
         }
       ]
     ],
+    "extra": {
+      "eas": {
+        "projectId": "58c7c926-0fd6-48a0-8898-f150ecf4f446"
+      }
+    },
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
