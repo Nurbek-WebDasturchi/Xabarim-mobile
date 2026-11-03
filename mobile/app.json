@@ -4,7 +4,7 @@
     "slug": "xabarim-mobile",
     "version": "1.0.0",
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "fingerprint"
     },
     "scheme": "xabarim",
     "orientation": "portrait",
@@ -40,7 +40,7 @@
     },
     "updates": {
       "url": "https://u.expo.dev/58c7c926-0fd6-48a0-8898-f150ecf4f446",
-      "checkAutomatically": "ON_LOAD",
+      "checkAutomatically": "NEVER",
       "fallbackToCacheTimeout": 0
     },
     "owner": "ahmedov.provides"

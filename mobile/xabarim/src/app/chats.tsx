@@ -4,6 +4,7 @@ import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, StyleShe
 import { useAuth } from '@/features/auth/auth-context';
 import { loadConversations, subscribeToMessages, type Conversation, type Message } from '@/features/chats/chat-service';
 import { supabase } from '@/lib/supabase';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const timeLabel = (date: string) => {
   const value = new Date(date), now = new Date();
@@ -13,6 +14,7 @@ const timeLabel = (date: string) => {
 
 export default function ChatsScreen() {
   const { user, profile, session, loading, signOut } = useAuth();
+  const insets = useSafeAreaInsets();
   const [rows, setRows] = useState<Conversation[]>([]);
   const [busy, setBusy] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -30,7 +32,7 @@ export default function ChatsScreen() {
   const filtered = rows.filter((row) => `${row.peer.full_name ?? ''} ${row.peer.username}`.toLowerCase().includes(query.toLowerCase()));
   const doSignOut = async () => { try { await signOut(); } catch (e) { setError(e instanceof Error ? e.message : 'Chiqishda xatolik yuz berdi.'); } };
 
-  return <View style={styles.page}>
+  return <View style={[styles.page, { paddingTop: Math.max(insets.top, 16), paddingBottom: insets.bottom }]}>
     <View style={styles.header}><View><Text style={styles.greeting}>Xabarim</Text><Text style={styles.heading}>Xabarlar</Text></View><Pressable onPress={doSignOut} style={styles.avatar} accessibilityLabel="Hisobdan chiqish"><Text style={styles.avatarText}>{(profile?.full_name || profile?.username || 'X').slice(0, 1).toUpperCase()}</Text></Pressable></View>
     <View style={styles.search}><Text style={styles.searchIcon}>⌕</Text><TextInput value={query} onChangeText={setQuery} placeholder="Chatlardan qidirish" placeholderTextColor="#999AAD" style={styles.searchInput} /></View>
     {!!error && <Pressable onPress={() => void load()}><Text style={styles.error}>{error}  ·  Qayta urinish</Text></Pressable>}

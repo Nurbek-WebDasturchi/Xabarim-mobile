@@ -27,3 +27,12 @@ Press `a` in the Expo terminal or run `npm run android` to open Android. The And
 - Text posts, post reactions/comments, and 24-hour text notes.
 
 Google OAuth, group/community screens, media uploads, push notification navigation, saved messages, and XCoin/Premium/Telegram flows still need migration. Those features are present in the web app but are not part of this native MVP.
+# Xabarim Mobile releases
+
+## Android install and in-app updates
+
+Create the installable production APK with `npm run build:android`. Users install this APK once. Compatible JavaScript, screen layout, text, and bundled asset updates can then be published to the production channel with `npm run update:production -- --message "Describe the change"`. On app launch the app checks for an update and shows **Yangi versiya mavjud**; the user taps **Yangilash** to download and apply it.
+
+The app uses Expo's `fingerprint` runtime policy. Native changes, app permissions, native dependencies, and SDK upgrades produce a different runtime and require a new APK. Publish native-dependent changes only with a build; EAS Update will target only builds with a matching runtime. To release a new APK, increment the app version in `app.json`, build it, and distribute the APK.
+
+Use `npm run update:preview -- --message "Describe the change"` for updates to the preview channel. EAS CLI authentication and the linked EAS project are required to build or publish.

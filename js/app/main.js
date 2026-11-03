@@ -1468,12 +1468,45 @@
       .forEach((p) => leaveFsFallback(p, true)),
   );
   document.addEventListener("keydown", (e) => {
+    const activePlayer = e.target.closest?.(".msg-video-player") ||
+      document.querySelector(".msg-video-player:focus-within");
+    if (e.key.toLowerCase() === "f" && activePlayer &&
+        !/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) {
+      const activeVideo = activePlayer.querySelector("video");
+      if (inFs(activePlayer)) void closeFs(activePlayer);
+      else void enterFs(activePlayer, activeVideo);
+      e.preventDefault();
+      return;
+    }
     if (e.key === "Escape")
       document
         .querySelectorAll(".msg-video-player.is-fullscreen")
         .forEach((p) => leaveFsFallback(p));
   });
 
+  let videoTapTimer = null;
+  document.addEventListener("dblclick", (e) => {
+    const video = e.target.closest?.(".msg-video-player video");
+    if (!video) return;
+    clearTimeout(videoTapTimer);
+    videoTapTimer = null;
+    const post = video.closest(".msg");
+    // Video xabarlari lentadagi post emas; double click yurak animatsiyasi video ustida ko'rinadi.
+    const player = video.closest(".msg-video-player");
+    const feedback = player.querySelector(".video-feedback");
+    feedback.innerHTML = '<i class="bi bi-heart-fill"></i>';
+    player.classList.remove("video-liked");
+    void player.offsetWidth;
+    player.classList.add("video-liked");
+    clearTimeout(player.likeTimer);
+    player.likeTimer = setTimeout(() => {
+      player.classList.remove("video-liked");
+      feedback.innerHTML = '<i class="bi bi-play-fill"></i>';
+    }, 850);
+    if (post?.dataset.post) void setLike(+post.dataset.post, true);
+    e.preventDefault();
+    e.stopPropagation();
+  }, true);
   document.addEventListener("click", async (e) => {
     const player = e.target.closest(".msg-video-player");
     if (!player) return;
@@ -1482,6 +1515,20 @@
     if (tg.closest("[data-video-close]")) {
       await closeFs(player);
     } else if (tg.closest("[data-video-play]") || tg === video) {
+      if (tg === video && e.detail >= 2) {
+        clearTimeout(videoTapTimer);
+        videoTapTimer = null;
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      if (tg === video && e.detail === 1) {
+        clearTimeout(videoTapTimer);
+        videoTapTimer = setTimeout(() => togglePlay(player, video), 260);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       // ijro paytida boshqaruv yashirin bo'lsa: birinchi bosish uni ko'rsatadi (sekin/tez o'tkazish uchun)
       if (
         tg === video &&
