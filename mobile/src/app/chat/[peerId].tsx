@@ -59,7 +59,7 @@ export default function ChatScreen() {
       return <View style={[styles.messageLine, mine ? styles.myLine : styles.theirLine]}><View style={[styles.bubble, mine ? styles.myBubble : styles.theirBubble]}><Text style={[styles.body, mine && styles.myBody]}>{item.body || (item.file_url ? '📎 Fayl' : '')}</Text><View style={styles.meta}><Text style={[styles.messageTime, mine && styles.myTime]}>{new Date(item.created_at).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })}</Text>{mine && <Text style={styles.status}>{item.read ? '✓✓' : item.delivered_at ? '✓✓' : '✓'}</Text>}</View></View></View>;
     }} />}
     {!!error && <Pressable onPress={() => void load()}><Text style={styles.error}>{error}  ·  Qayta urinish</Text></Pressable>}
-    <View style={styles.composer}><TextInput value={text} onChangeText={setText} placeholder="Xabar yozing..." placeholderTextColor="#A0A1B0" multiline style={styles.input} maxLength={4000} onSubmitEditing={submit} blurOnSubmit={false} /><Pressable onPress={submit} disabled={!text.trim() || sending} style={[styles.send, (!text.trim() || sending) && styles.sendDisabled]}><Text style={styles.sendText}>➤</Text></Pressable></View>
+    <View style={[styles.composer, { paddingBottom: Math.max(insets.bottom, 12) }]}><TextInput value={text} onChangeText={setText} placeholder="Xabar yozing..." placeholderTextColor="#A0A1B0" multiline style={styles.input} maxLength={4000} onSubmitEditing={submit} blurOnSubmit={false} /><Pressable onPress={submit} disabled={!text.trim() || sending} style={[styles.send, (!text.trim() || sending) && styles.sendDisabled]}><Text style={styles.sendText}>➤</Text></Pressable></View>
   </KeyboardAvoidingView>;
 }
 

@@ -2,13 +2,13 @@
   "expo": {
     "name": "Xabarim",
     "slug": "xabarim-mobile",
-    "version": "1.0.0",
+    "version": "0.9.1",
     "runtimeVersion": {
       "policy": "fingerprint"
     },
     "scheme": "xabarim",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/xabarim-logo.png",
     "userInterfaceStyle": "automatic",
     "plugins": [
       "expo-router",
@@ -22,7 +22,7 @@
       "package": "uz.xabarim.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#5848E8",
-        "foregroundImage": "./assets/android-icon-foreground.png"
+        "foregroundImage": "./assets/xabarim-logo.png"
       },
       "predictiveBackGestureEnabled": true
     },

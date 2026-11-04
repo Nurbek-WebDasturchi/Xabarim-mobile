@@ -6,7 +6,7 @@ GitHub, Vercel va Expo APK orqali o‘zgarishlarni qanday joriy etish bo‘yicha
 
 Eng muhim qoida: `pages`, `css`, `js` va `img` ichidagi web UI o‘zgarishlari GitHub → Vercel deploy’dan keyin APK’ni qayta o‘rnatmasdan telefonda ko‘rinadi. Faqat `mobile/App.tsx`, `mobile/app.json` yoki native ikonka o‘zgarsa yangi APK build qilinadi.
 
-# Xabarim v0.9.20 (frontend)
+# Xabarim v0.9.1 (frontend)
 
 ## v0.9.20 — 2026-10-23 (Note reaksiyalari va bir oylik Premium)
 
