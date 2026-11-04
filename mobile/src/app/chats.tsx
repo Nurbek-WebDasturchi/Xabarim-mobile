@@ -2,7 +2,7 @@ import { Redirect, router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAuth } from '@/features/auth/auth-context';
-import { loadConversations, loadRoomConversations, subscribeToMessages, type Conversation, type Message, type RoomConversation } from '@/features/chats/chat-service';
+import { describeChatLoadError, loadConversations, loadRoomConversations, subscribeToMessages, type Conversation, type Message, type RoomConversation } from '@/features/chats/chat-service';
 import { AppNav } from '@/components/app-nav';
 import { AppHeader } from '@/components/app-header';
 import { useThemeColors, type ThemeColors } from '@/components/theme';
@@ -26,13 +26,13 @@ export default function ChatsScreen() {
   const [groups, setGroups] = useState<RoomConversation[]>([]);
   const load = useCallback(async () => {
     if (!user) return;
-    try { setError(''); setRows(await loadConversations(user.id)); } catch (e) { setError(e instanceof Error ? e.message : 'Chatlarni yuklab bo‘lmadi.'); } finally { setBusy(false); setRefreshing(false); }
+    try { setError(''); setRows(await loadConversations(user.id)); } catch (e) { setError(describeChatLoadError(e, 'Chatlarni yuklab bo‘lmadi.')); } finally { setBusy(false); setRefreshing(false); }
   }, [user]);
   useEffect(() => { void load(); }, [load]);
   const loadGroups = useCallback(async () => {
     if (!user) return;
     try { setError(''); setGroups(await loadRoomConversations(user.id)); }
-    catch (e) { setError(e instanceof Error ? e.message : 'Guruhlarni yuklab bo‘lmadi.'); }
+    catch (e) { setError(describeChatLoadError(e, 'Guruhlarni yuklab bo‘lmadi.')); }
   }, [user]);
   useEffect(() => { if (tab === 'groups') void loadGroups(); }, [loadGroups, tab]);
   useEffect(() => subscribeToMessages((message: Message) => {

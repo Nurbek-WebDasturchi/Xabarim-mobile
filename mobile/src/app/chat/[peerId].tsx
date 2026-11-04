@@ -4,7 +4,7 @@ import { ActivityIndicator, Alert, FlatList, Image, KeyboardAvoidingView, Platfo
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/features/auth/auth-context';
 import { useThemeColors, type ThemeColors } from '@/components/theme';
-import { loadMessages, markConversationRead, sendMessage, subscribeToMessages, type Message } from '@/features/chats/chat-service';
+import { describeChatLoadError, loadMessages, markConversationRead, sendMessage, subscribeToMessages, type Message } from '@/features/chats/chat-service';
 import { getSupabaseClient } from '@/lib/supabase';
 
 export default function ChatScreen() {
@@ -32,7 +32,7 @@ export default function ChatScreen() {
       setMessages(rows);
       await markConversationRead(user.id, peerId);
       setError('');
-    } catch (e) { setError(e instanceof Error ? e.message : 'Xabarlarni olib bo‘lmadi.'); }
+    } catch (e) { setError(describeChatLoadError(e, 'Xabarlarni olib bo‘lmadi.')); }
     finally { setBusy(false); }
   }, [user, peerId]);
   useEffect(() => { void load(); }, [load]);

@@ -18,12 +18,22 @@ export type Conversation = { peer: Profile; last: Message; unread: number };
 export type RoomConversation = { room: { id: number; name: string; kind: string; description: string | null }; last: Message | null; unread: number };
 export type Community = { id: number; name: string; kind: 'community'; description: string | null };
 
+export function describeChatLoadError(error: unknown, fallback: string): string {
+  if (!error || typeof error !== 'object') return fallback;
+  const dbError = error as { message?: string; code?: string; details?: string; hint?: string };
+  const code = dbError.code ? ` [${dbError.code}]` : '';
+  const message = dbError.message?.trim();
+  return message ? `${fallback}${code}: ${message}` : fallback;
+}
+
 function client() {
   return getSupabaseClient();
 }
 
 export async function loadConversations(userId: string): Promise<Conversation[]> {
   const db = client();
+  // Keep the personal-chat filter independent from the OR expression so PostgREST
+  // cannot accidentally include room messages in the inbox query.
   const { data, error } = await db.from('messages').select('id,sender,receiver,body,file_url,file_type,created_at,read,delivered_at,room_id')
     .is('room_id', null).or(`sender.eq.${userId},receiver.eq.${userId}`).order('created_at', { ascending: false }).limit(300);
   if (error) throw error;
@@ -108,7 +118,8 @@ export async function markRoomRead(roomId: number, userId: string) {
 export async function loadMessages(userId: string, peerId: string): Promise<Message[]> {
   const db = client();
   const { data, error } = await db.from('messages').select('id,sender,receiver,body,file_url,file_type,created_at,read,delivered_at,room_id')
-    .is('room_id', null).or(`and(sender.eq.${userId},receiver.eq.${peerId}),and(sender.eq.${peerId},receiver.eq.${userId})`)
+    .is('room_id', null)
+    .or(`and(sender.eq.${userId},receiver.eq.${peerId}),and(sender.eq.${peerId},receiver.eq.${userId})`)
     .order('created_at', { ascending: true }).limit(300);
   if (error) throw error;
   return (data ?? []) as Message[];
