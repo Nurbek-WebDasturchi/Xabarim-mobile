@@ -88,11 +88,4 @@ begin
   return new;
 end $$;
 
--- 5) Tayyor jamiyatlar (xohlagancha qo'shing)
-insert into rooms (kind, name, description, created_by) values
-  ('community','Dasturchilar','Dasturchilar jamiyati: kod, loyihalar, ish',null),
-  ('community','Medik xodimlar','Shifokorlar, hamshiralar va tibbiyot talabalari',null),
-  ('community','O''qituvchilar','Ustozlar va pedagoglar',null),
-  ('community','Talabalar','Talabalar hayoti va o''qish',null),
-  ('community','Tadbirkorlar','Biznes va startaplar',null),
-  ('community','Dizaynerlar','UI/UX, grafika, tasvir',null);
+-- Hamjamiyatlar administrator tomonidan alohida qo'shiladi.

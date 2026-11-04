@@ -418,16 +418,18 @@
       h = comms
         .filter(
           (r) =>
-            !q ||
-            r.name.toLocaleLowerCase().includes(q) ||
-            (r.description || "").toLocaleLowerCase().includes(q),
+            r.kind === "community" &&
+            r.name === "Xabarim Official" &&
+            (!q ||
+              r.name.toLocaleLowerCase().includes(q) ||
+              (r.description || "").toLocaleLowerCase().includes(q)),
         )
         .map((r) =>
           roomCard(
             r,
             mine.has(r.id)
               ? '<i class="bi bi-check-circle-fill text-success"></i>'
-              : `<button class="join-btn" data-open-community="${r.id}">${t("community_view")}</button>`,
+              : `<button class="join-btn" data-open-community="${r.id}">${t("join")}</button>`,
           ),
         )
         .join("");
@@ -737,7 +739,15 @@
     const openCommunity = e.target.closest("[data-open-community]");
     if (openCommunity) {
       e.stopPropagation();
-      openTarget({ type: "room", id: +openCommunity.dataset.openCommunity });
+      Spin.on(openCommunity);
+      try {
+        await DB.join(+openCommunity.dataset.openCommunity, me.id);
+        await loadRooms();
+        await openTarget({ type: "room", id: +openCommunity.dataset.openCommunity });
+      } catch (x) {
+        fail(x);
+      }
+      Spin.off(openCommunity);
       return;
     }
     const exAdd = e.target.closest("[data-explore-add]");
@@ -1631,7 +1641,7 @@
         const k = dayKey(m.created_at),
           s = k !== last ? daySep(m.created_at) : "";
         last = k;
-        return s + msgHTML(m);
+        return s + `<div class="${m.community_locked ? "community-locked-message" : ""}">${msgHTML(m)}</div>`;
       })
       .join("");
   };
@@ -2058,24 +2068,49 @@
       if (requestSeq !== openTargetSeq || !tg.r) return;
     }
     target = tg;
-    target.readOnly =
+      target.readOnly =
       tg.type === "room" &&
       tg.r.kind === "community" &&
       !rooms.some((r) => r.id === tg.id);
     $(".input-box").classList.toggle("hide", !!target.readOnly);
     $("#room-readonly-banner").classList.toggle("hide", !target.readOnly);
+    if (target.readOnly) {
+      $("#room-readonly-banner").innerHTML = `${esc(t("community_read_only"))}<button type="button" class="join-btn" id="community-join">${esc(t("join"))}</button>`;
+      $("#community-join").onclick = async (event) => {
+        const button = event.currentTarget;
+        Spin.on(button);
+        try {
+          await DB.join(tg.id, me.id);
+          await loadRooms(true);
+          await openTarget({ type: "room", id: tg.id });
+        } catch (error) {
+          fail(error);
+        }
+        Spin.off(button);
+      };
+    } else {
+      $("#room-readonly-banner").textContent = "";
+    }
     pane("room");
     header();
     $(".input-box").classList.add("hide");
     applyChatBg();
     roomOwner = false;
-    const [ms, owner] = await Promise.all([
-      DB.msgs(me.id, tg),
+    const [allMessages, owner] = await Promise.all([
+      DB.msgs(me.id, { ...tg, member: tg.type === "room" && rooms.some((r) => r.id === tg.id) }),
       tg.type === "room" && tg.r.kind === "group"
         ? DB.isGroupOwner(tg.id, me.id).catch(() => false)
         : false,
     ]);
     if (requestSeq !== openTargetSeq) return;
+    const member = tg.type === "room" && rooms.some((r) => r.id === tg.id);
+    const ms = tg.type === "room" && tg.r.kind === "community" && !member
+      ? allMessages.slice(-5).map((message, index) => ({ ...message, community_locked: index === 0 }))
+      : allMessages;
+    if (target.readOnly) {
+      const hiddenCount = Math.max(0, Number(tg.r.message_count || 0) - ms.length);
+      if (hiddenCount) $("#room-readonly-banner").insertAdjacentHTML("beforeend", `<div class="community-more-note">${esc(t("join_to_see_older", { n: hiddenCount }))}</div>`);
+    }
     roomOwner = !!owner;
     await need(ms.map((m) => m.sender));
     if (requestSeq !== openTargetSeq) return;

@@ -1,6 +1,6 @@
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Image, KeyboardAvoidingView, Platform, Pressable, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/features/auth/auth-context';
 import { useThemeColors, type ThemeColors } from '@/components/theme';
@@ -52,8 +52,13 @@ export default function ChatScreen() {
     } catch (e) { setText(body); setError(e instanceof Error ? e.message : 'Xabar yuborilmadi.'); }
     finally { setSending(false); }
   };
+  const showChatMenu = () => Alert.alert(name || username || 'Suhbat', undefined, [
+    { text: 'Profilni ko‘rish', onPress: () => router.push({ pathname: '/profile', params: { userId: peerId } }) },
+    { text: 'Profil havolasini ulashish', onPress: () => { void Share.share({ message: `Xabarim: @${username || peerId}` }); } },
+    { text: 'Bekor qilish', style: 'cancel' },
+  ]);
   return <KeyboardAvoidingView style={styles.page} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}>
-    <View style={[styles.header, { height: 67 + insets.top, paddingTop: insets.top }]}><Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹</Text></Pressable><Pressable onPress={() => router.push({ pathname: '/profile', params: { userId: peerId } })} style={styles.identity}><View style={styles.avatar}>{loadedAvatar ? <Image source={{ uri: loadedAvatar }} style={styles.avatarImage} /> : <Text style={styles.initial}>{(name || username || 'X').slice(0, 1).toUpperCase()}</Text>}</View><View style={styles.person}><Text numberOfLines={1} style={styles.name}>{name || username || 'Suhbat'}</Text><Text style={styles.username}>{username ? `@${username}` : 'Xabarim foydalanuvchisi'}</Text></View></Pressable><View style={styles.more}><Text style={styles.moreText}>•••</Text></View></View>
+    <View style={[styles.header, { height: 67 + insets.top, paddingTop: insets.top }]}><Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹</Text></Pressable><Pressable onPress={() => router.push({ pathname: '/profile', params: { userId: peerId } })} style={styles.identity}><View style={styles.avatar}>{loadedAvatar ? <Image source={{ uri: loadedAvatar }} style={styles.avatarImage} /> : <Text style={styles.initial}>{(name || username || 'X').slice(0, 1).toUpperCase()}</Text>}</View><View style={styles.person}><Text numberOfLines={1} style={styles.name}>{name || username || 'Suhbat'}</Text><Text style={styles.username}>{username ? `@${username}` : 'Xabarim foydalanuvchisi'}</Text></View></Pressable><Pressable accessibilityRole="button" accessibilityLabel="Suhbat menyusi" hitSlop={12} onPress={showChatMenu} style={styles.more}><Text style={styles.moreText}>•••</Text></Pressable></View>
     {busy ? <View style={styles.center}><ActivityIndicator color="#5848E8" /></View> : <FlatList ref={list} data={messages} keyExtractor={(item) => String(item.id)} contentContainerStyle={messages.length ? styles.messages : styles.emptyMessages} onContentSizeChange={() => list.current?.scrollToEnd({ animated: true })} ListEmptyComponent={<View style={styles.empty}><View style={styles.emptyAvatar}><Text style={styles.emptyInitial}>{(name || username || 'X').slice(0, 1).toUpperCase()}</Text></View><Text style={styles.emptyTitle}>Suhbatni boshlang</Text><Text style={styles.emptyText}>Birinchi xabaringizni yuboring 👋</Text></View>} renderItem={({ item }) => {
       const mine = item.sender === user?.id;
       return <View style={[styles.messageLine, mine ? styles.myLine : styles.theirLine]}><View style={[styles.bubble, mine ? styles.myBubble : styles.theirBubble]}><Text style={[styles.body, mine && styles.myBody]}>{item.body || (item.file_url ? '📎 Fayl' : '')}</Text><View style={styles.meta}><Text style={[styles.messageTime, mine && styles.myTime]}>{new Date(item.created_at).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })}</Text>{mine && <Text style={styles.status}>{item.read ? '✓✓' : item.delivered_at ? '✓✓' : '✓'}</Text>}</View></View></View>;

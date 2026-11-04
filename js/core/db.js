@@ -163,6 +163,9 @@ const DB = {
   async msgs(me, t) {
     let q = sb.from("messages").select("*");
     q = t.type === "room" ? q.eq("room_id", t.id) : q.or(`and(sender.eq.${me},receiver.eq.${t.id}),and(sender.eq.${t.id},receiver.eq.${me})`);
+    if (t.type === "room" && t.r?.kind === "community" && !t.member) {
+      return ok(await q.order("created_at", { ascending: false }).limit(5))?.reverse() || [];
+    }
     return ok(await q.order("created_at").limit(300)) || [];
   },
   async replyMessages(ids) {
@@ -254,11 +257,16 @@ const DB = {
   async groupByUsername(username) { return (await sb.from("rooms").select("*").eq("kind", "group").eq("username", username).maybeSingle()).data; },
   async communities() {
     // a'zolar soni: RLS tufayli room_members'dan to'g'ridan-to'g'ri sanab bo'lmaydi, shuning uchun rpc (schema_v3.sql)
-    const [listResult, countsResult] = await Promise.all([
-      sb.from("rooms").select("*").eq("kind", "community").order("name"),
+    const [listResult, countsResult, messageCountsResult] = await Promise.all([
+      sb.from("rooms").select("*").eq("kind", "community").eq("name", "Xabarim Official").order("name"),
       sb.rpc("community_counts"),
+      sb.rpc("community_message_counts"),
     ]);
     const list = ok(listResult) || [], { data } = countsResult;
+    if (messageCountsResult.data) {
+      const messageCounts = Object.fromEntries(messageCountsResult.data.map((row) => [row.room_id, row.message_count]));
+      list.forEach((r) => { r.message_count = messageCounts[r.id] || 0; });
+    }
     if (data) { const m = Object.fromEntries(data.map((x) => [x.room_id, x.members])); list.forEach((r) => (r.members = m[r.id] ?? 0)); }
     return list;
   },

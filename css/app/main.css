@@ -5951,6 +5951,20 @@ body.video-fs-open {
   font-size: 0.82rem;
   text-align: center;
 }
+.room-readonly-banner .join-btn {
+  display: block;
+  margin: 8px auto 0;
+}
+.community-more-note {
+  margin-top: 6px;
+}
+.community-locked-message {
+  position: relative;
+  filter: blur(7px);
+  opacity: 0.72;
+  pointer-events: none;
+  user-select: none;
+}
 /* Keep the app masthead and section title visually joined as one surface. */
 .app > header,
 .nav-md,
