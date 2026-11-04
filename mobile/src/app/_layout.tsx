@@ -57,7 +57,7 @@ function RootNavigator() {
     }
   };
 
-  return <><StatusBar style={mode === 'dark' ? 'light' : 'dark'} /><Stack screenOptions={{ headerShown: false, contentStyle: styles.screen }} />
+  return <><StatusBar style={mode === 'dark' ? 'light' : 'dark'} /><Stack screenOptions={{ headerShown: false, contentStyle: styles.screen }}><Stack.Screen name="community/[roomId]" /></Stack>
     {updateAvailable && <View style={styles.updateBanner}>
       <View style={styles.updateCopy}><Text style={styles.updateTitle}>Yangi versiya mavjud</Text><Text style={styles.updateMessage}>{updateError ? 'Yangilash amalga oshmadi. Qayta urinib ko‘ring.' : 'Ilovani yangilash uchun bosing.'}</Text></View>
       <Pressable accessibilityRole="button" disabled={downloading} onPress={applyUpdate} style={styles.updateButton}>

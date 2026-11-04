@@ -16,6 +16,7 @@ export type Message = {
 
 export type Conversation = { peer: Profile; last: Message; unread: number };
 export type RoomConversation = { room: { id: number; name: string; kind: string; description: string | null }; last: Message | null; unread: number };
+export type Community = { id: number; name: string; kind: 'community'; description: string | null };
 
 function client() {
   return getSupabaseClient();
@@ -68,6 +69,29 @@ export async function loadRoomMessages(roomId: number): Promise<Message[]> {
   const { data, error } = await client().from('messages').select('id,sender,receiver,body,file_url,file_type,created_at,read,delivered_at,room_id').eq('room_id', roomId).order('created_at', { ascending: true }).limit(500);
   if (error) throw error;
   return (data ?? []) as Message[];
+}
+
+export async function loadCommunity(roomId: number, userId: string) {
+  const db = client();
+  const { data: room, error: roomError } = await db.from('rooms').select('id,name,kind,description').eq('id', roomId).eq('kind', 'community').single();
+  if (roomError) throw roomError;
+  const { data: membership, error: membershipError } = await db.from('room_members').select('room_id').eq('room_id', roomId).eq('user_id', userId).maybeSingle();
+  if (membershipError) throw membershipError;
+  const { data: counts, error: countError } = await db.rpc('community_message_counts');
+  if (countError) throw countError;
+  const count = (counts ?? []).find((row: { room_id: number; message_count: number }) => row.room_id === roomId)?.message_count ?? 0;
+  return { room: room as Community, member: !!membership, messageCount: count };
+}
+
+export async function loadCommunityPreview(roomId: number): Promise<Message[]> {
+  const { data, error } = await client().from('messages').select('id,sender,receiver,body,file_url,file_type,created_at,read,delivered_at,room_id').eq('room_id', roomId).order('created_at', { ascending: false }).limit(5);
+  if (error) throw error;
+  return ((data ?? []) as Message[]).reverse();
+}
+
+export async function joinCommunity(roomId: number, userId: string) {
+  const { error } = await client().from('room_members').insert({ room_id: roomId, user_id: userId });
+  if (error && error.code !== '23505') throw error;
 }
 
 export async function sendRoomMessage(userId: string, roomId: number, body: string): Promise<Message> {

@@ -4,6 +4,25 @@
 drop policy if exists "messages: read" on public.messages;
 drop policy if exists "messages: read own" on public.messages;
 
+create or replace function public.can_read_room_message(p_room bigint, p_message bigint)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1
+    from public.rooms r
+    where r.id = p_room
+      and r.kind = 'community'
+      and p_message in (
+        select recent.id
+        from public.messages recent
+        where recent.room_id = p_room
+        order by recent.created_at desc, recent.id desc
+        limit 5
+      )
+  );
+$$;
+revoke all on function public.can_read_room_message(bigint, bigint) from public;
+grant execute on function public.can_read_room_message(bigint, bigint) to authenticated;
+
 create policy "messages: read" on public.messages
   for select to authenticated
   using (
@@ -27,16 +46,7 @@ create policy "messages: read" on public.messages
         and (
           sender = auth.uid()
           or public.is_member(room_id)
-          or (
-            exists (select 1 from public.rooms r where r.id = messages.room_id and r.kind = 'community')
-            and messages.id in (
-              select recent.id
-              from public.messages recent
-              where recent.room_id = messages.room_id
-              order by recent.created_at desc, recent.id desc
-              limit 5
-            )
-          )
+          or public.can_read_room_message(room_id, id)
         )
       )
     )
