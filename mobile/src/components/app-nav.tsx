@@ -4,16 +4,17 @@ import { BlurView } from 'expo-blur';
 import { Feather } from '@expo/vector-icons';
 import { useThemeColors, useThemeMode, type ThemeColors } from './theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-const items = [
-  { path: '/feed', label: 'Postlar', icon: 'home' },
-  { path: '/friends', label: 'Do‘stlar', icon: 'users' },
-  { path: '/chats', label: 'Xabarlar', icon: 'message-circle' },
-  { path: '/communities', label: 'Hamjamiyat', icon: 'globe' },
-  { path: '/profile', label: 'Profil', icon: 'user' },
-] as const;
+import { useT } from '@/features/i18n/i18n';
 
 export function AppNav() {
+  const t = useT();
+  const items = [
+    { path: '/feed', label: t('posts'), icon: 'home' },
+    { path: '/communities', label: t('groups'), icon: 'users' },
+    { path: '/chats', label: t('chats'), icon: 'message-circle' },
+    { path: '/friends', label: t('exploreFriends'), icon: 'search' },
+    { path: '/profile', label: t('profile'), icon: 'user' },
+  ] as const;
   const pathname = usePathname();
   const palette = useThemeColors();
   const mode = useThemeMode();

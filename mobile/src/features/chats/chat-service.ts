@@ -47,7 +47,7 @@ export async function loadConversations(userId: string): Promise<Conversation[]>
   }
   const ids = [...latest.keys()];
   if (ids.length === 0) return [];
-  const { data: profiles, error: profileError } = await db.from('profiles').select('id,username,full_name,avatar_url,bio,last_seen').in('id', ids);
+  const { data: profiles, error: profileError } = await db.from('profiles').select('id,username,full_name,avatar_url,bio,last_seen,is_private').in('id', ids);
   if (profileError) throw profileError;
   const byId = new Map((profiles as Profile[]).map((item) => [item.id, item]));
   return [...latest.entries()].flatMap(([id, value]) => {
@@ -108,6 +108,15 @@ export async function sendRoomMessage(userId: string, roomId: number, body: stri
   const { data, error } = await client().from('messages').insert({ sender: userId, room_id: roomId, body }).select('id,sender,receiver,body,file_url,file_type,created_at,read,delivered_at,room_id').single();
   if (error) throw error;
   return data as Message;
+}
+
+export async function sendPushMessage(sessionToken: string, recipient: string, message: Message) {
+  if (message.room_id || !message.receiver) return;
+  await fetch('https://www.xabarim.uz/api/push/message', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${sessionToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ recipient, body: message.body || 'Sizga yangi xabar yuborildi', message_id: message.id }),
+  });
 }
 
 export async function markRoomRead(roomId: number, userId: string) {

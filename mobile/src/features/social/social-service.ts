@@ -1,5 +1,6 @@
 import type { Profile } from '@/features/auth/auth-context';
 import { getSupabaseClient } from '@/lib/supabase';
+import { sendActivityPush } from '@/features/notifications/push-notifications';
 
 export type Post = {
   id: number;
@@ -63,14 +64,55 @@ export async function loadFollowStats(userId: string) {
 }
 
 export async function updateMyProfile(userId: string, fullName: string, bio: string) {
-  const { data, error } = await getSupabaseClient().from('profiles').update({ full_name: fullName.trim(), bio: bio.trim() }).eq('id', userId).select('id,username,full_name,avatar_url,bio,last_seen').single();
+  const { data, error } = await getSupabaseClient().from('profiles').update({ full_name: fullName.trim(), bio: bio.trim() }).eq('id', userId).select('id,username,full_name,avatar_url,bio,last_seen,is_private').single();
   if (error) throw error;
   return data as Profile;
 }
 
-export async function followUser(userId: string) {
-  const { error } = await getSupabaseClient().from('follows').insert({ following: userId });
-  if (error && error.code !== '23505') throw error;
+export async function updateAccountPrivacy(userId: string, isPrivate: boolean) {
+  const { error } = await getSupabaseClient().from('profiles').update({ is_private: isPrivate }).eq('id', userId);
+  if (error) throw error;
+}
+
+export type FollowState = 'none' | 'pending' | 'following';
+export async function loadFollowState(myId: string, targetId: string): Promise<FollowState> {
+  const db = getSupabaseClient();
+  const [{ data: follow, error: followError }, { data: request, error: requestError }] = await Promise.all([
+    db.from('follows').select('follower').eq('follower', myId).eq('following', targetId).maybeSingle(),
+    db.from('follow_requests').select('id').eq('requester_id', myId).eq('target_id', targetId).maybeSingle(),
+  ]);
+  if (followError) throw followError;
+  if (requestError) throw requestError;
+  return follow ? 'following' : request ? 'pending' : 'none';
+}
+
+export async function followUser(myId: string, userId: string, isPrivate: boolean, sessionToken?: string) {
+  const db = getSupabaseClient();
+  if (isPrivate) {
+    const { error } = await db.from('follow_requests').upsert({ requester_id: myId, target_id: userId }, { onConflict: 'requester_id,target_id', ignoreDuplicates: true });
+    if (error) throw error;
+  } else {
+    const { error } = await db.from('follows').insert({ follower: myId, following: userId });
+    if (error && error.code !== '23505') throw error;
+    if (!error && sessionToken) void sendActivityPush(sessionToken, userId, 'follow');
+  }
+}
+
+export async function cancelFollowRequest(myId: string, targetId: string) {
+  const { error } = await getSupabaseClient().from('follow_requests').delete().eq('requester_id', myId).eq('target_id', targetId);
+  if (error) throw error;
+}
+
+export async function loadIncomingFollowRequests(userId: string) {
+  const { data, error } = await getSupabaseClient().from('follow_requests').select('id,requester_id,created_at,profiles!follow_requests_requester_id_fkey(id,username,full_name,avatar_url)').eq('target_id', userId).order('created_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function decideFollowRequest(requestId: number, requesterId: string, accept: boolean) {
+  const { data, error } = await getSupabaseClient().rpc('decide_follow_request', { p_request: requestId, p_accept: accept });
+  if (error) throw error;
+  if (!data) throw new Error('So‘rov topilmadi yoki allaqachon ko‘rib chiqilgan.');
 }
 
 export async function unfollowUser(myId: string, userId: string) {
@@ -78,9 +120,10 @@ export async function unfollowUser(myId: string, userId: string) {
   if (error) throw error;
 }
 
-export async function reactToPost(postId: number, userId: string, emoji: string) {
+export async function reactToPost(postId: number, userId: string, emoji: string, authorId?: string, sessionToken?: string) {
   const { error } = await getSupabaseClient().from('post_reactions').upsert({ post_id: postId, user_id: userId, emoji }, { onConflict: 'post_id,user_id' });
   if (error) throw error;
+  if (authorId && authorId !== userId && sessionToken) void sendActivityPush(sessionToken, authorId, 'like');
 }
 
 export async function removePostReaction(postId: number, userId: string) {

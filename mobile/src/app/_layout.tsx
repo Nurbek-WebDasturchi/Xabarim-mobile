@@ -2,14 +2,17 @@ import { Stack } from 'expo-router';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider, useAuth } from '@/features/auth/auth-context';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useThemeColors, useThemeMode, type ThemeColors } from '@/components/theme';
 import { router, useSegments } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Updates from 'expo-updates';
+import * as Notifications from 'expo-notifications';
+import { registerPushNotifications } from '@/features/notifications/push-notifications';
+import { LanguageProvider } from '@/features/i18n/i18n';
 
 export default function RootLayout() {
-  return <SafeAreaProvider><AuthProvider><RootNavigator /></AuthProvider></SafeAreaProvider>;
+  return <SafeAreaProvider><LanguageProvider><AuthProvider><RootNavigator /></AuthProvider></LanguageProvider></SafeAreaProvider>;
 }
 
 function RootNavigator() {
@@ -21,6 +24,21 @@ function RootNavigator() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [updateError, setUpdateError] = useState(false);
+  const registeredUser = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!session || registeredUser.current === session.user.id) return;
+    registeredUser.current = session.user.id;
+    void registerPushNotifications(session).catch(() => { registeredUser.current = null; });
+  }, [session]);
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data;
+      if (typeof data?.url === 'string') router.push(data.url as never);
+    });
+    return () => subscription.remove();
+  }, []);
 
   const checkForUpdate = useCallback(async () => {
     if (__DEV__ || Updates.isEmbeddedLaunch) return;

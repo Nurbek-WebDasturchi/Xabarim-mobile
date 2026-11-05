@@ -16,7 +16,7 @@ export default function NewChatScreen() {
     setBusy(true); setError('');
     let supabase;
     try { supabase = getSupabaseClient(); } catch (e) { setError(e instanceof Error ? e.message : 'Server bilan ulanish yo‘q.'); setBusy(false); return; }
-    const { data, error: requestError } = await supabase.from('profiles').select('id,username,full_name,avatar_url,bio,last_seen').or(`username.ilike.%${q}%,full_name.ilike.%${q}%`).neq('id', user.id).limit(20);
+    const { data, error: requestError } = await supabase.from('profiles').select('id,username,full_name,avatar_url,bio,last_seen,is_private').or(`username.ilike.%${q}%,full_name.ilike.%${q}%`).neq('id', user.id).limit(20);
     if (requestError) setError(requestError.message); else setItems((data ?? []) as Profile[]);
     setBusy(false);
   }, [user]);

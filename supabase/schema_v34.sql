@@ -1,0 +1,1 @@
+-- No database changes are required. Activity pushes are sent by the authenticated app client.

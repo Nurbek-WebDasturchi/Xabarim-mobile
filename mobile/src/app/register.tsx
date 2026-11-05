@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAuth } from '@/features/auth/auth-context';
 import { colors } from '@/components/theme';
+import { useT } from '@/features/i18n/i18n';
 
 export default function RegisterScreen() {
   const { session, signUp } = useAuth();
+  const t = useT();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -24,12 +26,12 @@ export default function RegisterScreen() {
     <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
     <View style={styles.header}><Text style={styles.brand}>Xabarim</Text><Text style={styles.title}>Yangi hisob yarating</Text><Text style={styles.subtitle}>Do‘stlaringiz bilan suhbatni boshlang</Text></View>
     <View style={styles.card}>
-      <Text style={styles.label}>Ism</Text><TextInput placeholder="To‘liq ismingiz" placeholderTextColor="#9B9CAF" value={name} onChangeText={setName} style={styles.input} />
-      <Text style={styles.label}>Username</Text><TextInput autoCapitalize="none" autoCorrect={false} placeholder="username" placeholderTextColor="#9B9CAF" value={username} onChangeText={setUsername} style={styles.input} />
+      <Text style={styles.label}>{t('name')}</Text><TextInput placeholder={t('namePlaceholder')} placeholderTextColor="#9B9CAF" value={name} onChangeText={setName} style={styles.input} />
+      <Text style={styles.label}>{t('username')}</Text><TextInput autoCapitalize="none" autoCorrect={false} placeholder="username" placeholderTextColor="#9B9CAF" value={username} onChangeText={setUsername} style={styles.input} />
       <Text style={styles.hint}>Faqat lotin harflari, raqam va pastki chiziq</Text>
-      <Text style={styles.label}>Parol</Text><TextInput placeholder="Kamida 8 ta belgi" placeholderTextColor="#9B9CAF" value={password} onChangeText={setPassword} style={styles.input} secureTextEntry onSubmitEditing={submit} />
+      <Text style={styles.label}>{t('password')}</Text><TextInput placeholder={t('password')} placeholderTextColor="#9B9CAF" value={password} onChangeText={setPassword} style={styles.input} secureTextEntry onSubmitEditing={submit} />
       {!!error && <Text accessibilityRole="alert" style={styles.error}>{error}</Text>}
-      <Pressable accessibilityRole="button" onPress={submit} disabled={busy} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>{busy ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>Hisob yaratish</Text>}</Pressable>
+      <Pressable accessibilityRole="button" onPress={submit} disabled={busy} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>{busy ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>{t('register')}</Text>}</Pressable>
       <View style={styles.footer}><Text style={styles.footerText}>Hisobingiz bormi? </Text><Link href="/login" style={styles.link}>Kirish</Link></View>
     </View>
     </ScrollView>

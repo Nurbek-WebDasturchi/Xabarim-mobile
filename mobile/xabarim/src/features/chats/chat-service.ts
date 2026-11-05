@@ -72,3 +72,24 @@ export function subscribeToMessages(onMessage: (message: Message) => void) {
     .subscribe();
   return () => { void client().removeChannel(channel); };
 }
+
+export function subscribeToChatPresence(userId: string, peerId: string, handlers: {
+  onTyping: (typing: boolean) => void;
+  onLastSeen: (lastSeen: string | null) => void;
+}) {
+  const db = client();
+  const channel = db.channel(`private-chat:${[userId, peerId].sort().join(':')}`, {
+    config: { broadcast: { self: false }, presence: { key: userId } },
+  });
+  channel.on('broadcast', { event: 'typing' }, ({ payload }) => {
+    if (payload?.userId === peerId) handlers.onTyping(payload.typing === true);
+  }).on('postgres_changes', {
+    event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${peerId}`,
+  }, ({ new: profile }) => handlers.onLastSeen((profile as { last_seen?: string | null }).last_seen ?? null))
+    .subscribe();
+
+  return {
+    sendTyping: (typing: boolean) => channel.send({ type: 'broadcast', event: 'typing', payload: { userId, typing } }),
+    unsubscribe: () => { void db.removeChannel(channel); },
+  };
+}

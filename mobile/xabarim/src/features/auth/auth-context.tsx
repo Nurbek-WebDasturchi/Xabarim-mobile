@@ -1,5 +1,6 @@
 import type { Session, User } from '@supabase/supabase-js';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { AppState } from 'react-native';
 import { supabase } from '@/lib/supabase';
 
 export type Profile = {
@@ -56,6 +57,15 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     });
     return () => { active = false; listener.subscription.unsubscribe(); };
   }, [refreshProfile]);
+
+  useEffect(() => {
+    if (!supabase || !session?.user) return;
+    const touch = () => { void supabase.rpc('touch_presence').then(({ error }) => { if (!error) void refreshProfile().catch(() => {}); }); };
+    touch();
+    const timer = setInterval(touch, 60_000);
+    const subscription = AppState.addEventListener('change', (state) => { if (state === 'active') touch(); });
+    return () => { clearInterval(timer); subscription.remove(); };
+  }, [session?.user.id, refreshProfile]);
 
   const signIn = useCallback(async (username: string, password: string) => {
     if (!supabase) throw new Error('Ilova Supabase bilan sozlanmagan.');

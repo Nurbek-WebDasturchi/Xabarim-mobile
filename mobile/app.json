@@ -13,13 +13,18 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "expo-video"
+      "expo-video",
+      [
+        "expo-notifications",
+        { "defaultChannel": "xabarim-alerts-v1", "color": "#5848E8" }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
     },
     "android": {
       "package": "uz.xabarim.mobile",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#5848E8",
         "foregroundImage": "./assets/xabarim-logo.png"

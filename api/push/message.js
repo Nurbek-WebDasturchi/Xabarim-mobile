@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
     const profileResponse = await rest(`profiles?id=eq.${encodeURIComponent(sender.id)}&select=full_name,username`);
     const profile = profileResponse.ok ? (await profileResponse.json())[0] : null;
     const title = profile?.full_name || profile?.username || "Xabarim";
-    const payload = tokens.map((to) => ({ to, sound: "default", title, body, channelId: "messages", data: { url: `${process.env.PUBLIC_APP_URL || "https://www.xabarim.uz"}/pages/main.html${messageId ? `?message=${encodeURIComponent(messageId)}` : ""}` } }));
+    const payload = tokens.map((to) => ({ to, sound: "default", title, body, channelId: "xabarim-alerts-v1", priority: "high", data: { url: "xabarim://chats", messageId } }));
     const pushResponse = await fetch("https://exp.host/--/api/v2/push/send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     if (!pushResponse.ok) return res.status(502).json({ error: "PUSH_DELIVERY_FAILED" });
     return res.json({ ok: true, sent: tokens.length });

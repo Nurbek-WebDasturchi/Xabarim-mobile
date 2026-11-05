@@ -9,6 +9,7 @@ export type Profile = {
   avatar_url: string | null;
   bio: string | null;
   last_seen: string | null;
+  is_private?: boolean;
 };
 
 type AuthValue = {
@@ -36,7 +37,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     if (!supabase) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setProfile(null); return; }
-    const { data, error } = await supabase.from('profiles').select('id,username,full_name,avatar_url,bio,last_seen').eq('id', user.id).single();
+    const { data, error } = await supabase.from('profiles').select('id,username,full_name,avatar_url,bio,last_seen,is_private').eq('id', user.id).single();
     if (error) throw error;
     setProfile(data as Profile);
   }, []);

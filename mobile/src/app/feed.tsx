@@ -85,7 +85,7 @@ export default function FeedScreen() {
     if (forceLike && wasLiked) return;
     setLikedPosts((current) => wasLiked ? current.filter((id) => id !== post.id) : [...current, post.id]);
     setLikeCounts((current) => ({ ...current, [post.id]: Math.max(0, (current[post.id] ?? 0) + (wasLiked ? -1 : 1)) }));
-    try { if (wasLiked) await removePostReaction(post.id, user.id); else await reactToPost(post.id, user.id, '❤️'); }
+    try { if (wasLiked) await removePostReaction(post.id, user.id); else await reactToPost(post.id, user.id, '❤️', post.author, session?.access_token); }
     catch (e) {
       setLikedPosts((current) => wasLiked ? [...current, post.id] : current.filter((id) => id !== post.id));
       setLikeCounts((current) => ({ ...current, [post.id]: Math.max(0, (current[post.id] ?? 0) + (wasLiked ? 1 : -1)) }));
