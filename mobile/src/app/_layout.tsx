@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, AppState, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider, useAuth } from '@/features/auth/auth-context';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -22,6 +22,7 @@ function RootNavigator() {
   const styles = makeStyles(palette);
   const segments = useSegments();
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [updateError, setUpdateError] = useState(false);
   const registeredUser = useRef<string | null>(null);
@@ -41,14 +42,17 @@ function RootNavigator() {
   }, []);
 
   const checkForUpdate = useCallback(async () => {
-    if (__DEV__ || Updates.isEmbeddedLaunch) return;
+    if (__DEV__ || checkingUpdate) return;
+    setCheckingUpdate(true);
     try {
       const result = await Updates.checkForUpdateAsync();
       if (result.isAvailable) setUpdateAvailable(true);
     } catch {
       // Keep app startup available when the update service is offline.
+    } finally {
+      setCheckingUpdate(false);
     }
-  }, []);
+  }, [checkingUpdate]);
 
   useEffect(() => {
     if (loading) return;
@@ -59,6 +63,13 @@ function RootNavigator() {
 
   useEffect(() => {
     void checkForUpdate();
+  }, [checkForUpdate]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void checkForUpdate();
+    });
+    return () => subscription.remove();
   }, [checkForUpdate]);
 
   const applyUpdate = async () => {

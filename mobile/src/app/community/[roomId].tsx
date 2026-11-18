@@ -32,11 +32,13 @@ export default function CommunityScreen() {
       setRoom(state.room);
       setMember(state.member);
       setMessageCount(state.messageCount);
+      // The preview RPC applies the same visibility rules as community_message_counts
+      // and avoids relying on row-level access to the messages table for non-members.
       const rows = state.member ? await loadRoomMessages(roomId) : await loadCommunityPreview(roomId);
       setMessages(rows);
       if (state.member) await markRoomRead(roomId, user.id);
       setError('');
-    } catch (e) { setError(e instanceof Error ? e.message : 'Hamjamiyatni yuklab bo‘lmadi.'); }
+    } catch (e) { setError(e instanceof Error ? e.message : 'Hamjamiyatni yuklab bo‘lmadi.'); setRoom(null); }
     finally { setBusy(false); }
   }, [roomId, user]);
   useEffect(() => { void load(); }, [load]);

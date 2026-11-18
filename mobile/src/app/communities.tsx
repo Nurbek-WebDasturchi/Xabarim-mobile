@@ -24,7 +24,7 @@ export default function CommunitiesScreen() {
     if (!user) return;
     try {
       const db = getSupabaseClient();
-      const { data, error: loadError } = await db.from('rooms').select('id,name,kind,description').eq('kind', 'community').eq('name', 'Xabarim Official').maybeSingle();
+      const { data, error: loadError } = await db.from('rooms').select('id,name,kind,description').eq('kind', 'community').eq('name', 'Xabarim Official').limit(1).maybeSingle();
       if (loadError) throw loadError;
       if (data) {
         const { data: membership, error: memberError } = await db.from('room_members').select('room_id').eq('room_id', data.id).eq('user_id', user.id).maybeSingle();

@@ -12,6 +12,7 @@
     },
     "android": {
       "package": "uz.xabarim.mobile",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#5848E8",
         "foregroundImage": "./assets/images/icon.png"

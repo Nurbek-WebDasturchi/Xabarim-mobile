@@ -34,6 +34,13 @@ Run lint and typecheck before declaring any task done.
 Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `bunx eas-cli <command>` in Bun projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
 Docs: https://docs.expo.dev/eas/index.md
 
+## Release and update expectations
+
+- Before changing the app, classify whether the change affects native code, native dependencies, app config, permissions, or other build-time native settings.
+- For native changes, tell the user the change requires a new EAS build and a new install/update link or QR code. Do not present `eas update` as sufficient.
+- For JavaScript, styling, and other compatible non-native changes, use the production EAS Update flow. The app should expose an in-app “Yangilanishni tekshirish” action that checks the production channel, downloads an available update, and prompts the user to restart into it.
+- The in-app action only works in a production build configured with `expo-updates`, a matching runtime version, and the production update URL/channel. Changes to this update infrastructure itself require a new build.
+
 ## Rules
 
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.

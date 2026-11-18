@@ -45,7 +45,7 @@
     },
     "updates": {
       "url": "https://u.expo.dev/58c7c926-0fd6-48a0-8898-f150ecf4f446",
-      "checkAutomatically": "NEVER",
+      "checkAutomatically": "ON_LOAD",
       "fallbackToCacheTimeout": 0
     },
     "owner": "ahmedov.provides"

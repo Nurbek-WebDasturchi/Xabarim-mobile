@@ -52,6 +52,23 @@ export async function loadFeed(): Promise<Post[]> {
   return posts.map((post) => ({ ...post, profiles: byId.get(post.author) }));
 }
 
+export async function loadFollowingFeed(userId: string): Promise<Post[]> {
+  const db = getSupabaseClient();
+  const { data: follows, error: followsError } = await db.from('follows').select('following').eq('follower', userId);
+  if (followsError) throw followsError;
+  const authorIds = (follows ?? []).map((row) => row.following);
+  if (!authorIds.length) return [];
+  const { data, error } = await db.from('posts').select('*').in('author', authorIds).order('created_at', { ascending: false }).limit(50);
+  if (error) throw error;
+  const posts = (data ?? []) as Post[];
+  if (!posts.length) return [];
+  const ids = [...new Set(posts.map((post) => post.author))];
+  const { data: profiles, error: profileError } = await db.from('profiles').select('id,username,full_name,avatar_url').in('id', ids);
+  if (profileError) throw profileError;
+  const byId = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
+  return posts.map((post) => ({ ...post, profiles: byId.get(post.author) }));
+}
+
 export async function createPost(author: string, body: string) {
   const { error } = await getSupabaseClient().from('posts').insert({ author, body });
   if (error) throw error;
