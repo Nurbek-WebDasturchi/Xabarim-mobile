@@ -4,6 +4,7 @@ import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, Sc
 import { useAuth } from '@/features/auth/auth-context';
 import { colors } from '@/components/theme';
 import { useT } from '@/features/i18n/i18n';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function RegisterScreen() {
   const { session, signUp } = useAuth();
@@ -11,6 +12,7 @@ export default function RegisterScreen() {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   if (session) return <Redirect href="/chats" />;
@@ -29,7 +31,7 @@ export default function RegisterScreen() {
       <Text style={styles.label}>{t('name')}</Text><TextInput placeholder={t('namePlaceholder')} placeholderTextColor="#9B9CAF" value={name} onChangeText={setName} style={styles.input} />
       <Text style={styles.label}>{t('username')}</Text><TextInput autoCapitalize="none" autoCorrect={false} placeholder="username" placeholderTextColor="#9B9CAF" value={username} onChangeText={setUsername} style={styles.input} />
       <Text style={styles.hint}>Faqat lotin harflari, raqam va pastki chiziq</Text>
-      <Text style={styles.label}>{t('password')}</Text><TextInput placeholder={t('password')} placeholderTextColor="#9B9CAF" value={password} onChangeText={setPassword} style={styles.input} secureTextEntry onSubmitEditing={submit} />
+      <Text style={styles.label}>{t('password')}</Text><View style={styles.passwordField}><TextInput placeholder={t('password')} placeholderTextColor="#9B9CAF" value={password} onChangeText={setPassword} style={styles.passwordInput} secureTextEntry={!showPassword} onSubmitEditing={submit} /><Pressable accessibilityRole="button" accessibilityLabel={showPassword ? 'Parolni yashirish' : 'Parolni ko‘rsatish'} onPress={() => setShowPassword((visible) => !visible)} style={styles.passwordToggle}><Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={21} color={colors.muted} /></Pressable></View>
       {!!error && <Text accessibilityRole="alert" style={styles.error}>{error}</Text>}
       <Pressable accessibilityRole="button" onPress={submit} disabled={busy} style={({ pressed }) => [styles.button, pressed && styles.pressed]}>{busy ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>{t('register')}</Text>}</Pressable>
       <View style={styles.footer}><Text style={styles.footerText}>Hisobingiz bormi? </Text><Link href="/login" style={styles.link}>Kirish</Link></View>
@@ -38,4 +40,4 @@ export default function RegisterScreen() {
   </KeyboardAvoidingView>;
 }
 
-const styles = StyleSheet.create({ page: { flex: 1, backgroundColor: colors.background }, content: { flexGrow: 1, justifyContent: 'center', padding: 24 }, header: { alignItems: 'center', marginBottom: 26 }, logo: { width: 72, height: 72, marginBottom: 10 }, brand: { color: colors.blue, fontWeight: '900', fontSize: 18 }, title: { color: colors.blue, fontWeight: '800', fontSize: 25, marginTop: 18 }, subtitle: { color: colors.muted, fontSize: 14, marginTop: 7 }, card: { backgroundColor: colors.surface, padding: 24, borderRadius: 24, borderWidth: 1, borderColor: colors.border }, label: { color: colors.muted, fontWeight: '700', fontSize: 13, marginBottom: 8, marginTop: 12 }, input: { height: 52, borderRadius: 14, backgroundColor: colors.background, paddingHorizontal: 15, color: colors.text, fontSize: 15, borderWidth: 1, borderColor: colors.border }, hint: { color: colors.dim, fontSize: 12, marginTop: 6 }, error: { color: colors.red, fontSize: 13, lineHeight: 19, marginTop: 13 }, button: { height: 54, marginTop: 22, borderRadius: 15, backgroundColor: colors.blue, alignItems: 'center', justifyContent: 'center' }, buttonText: { color: 'white', fontSize: 16, fontWeight: '800' }, pressed: { opacity: 0.82 }, footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 21 }, footerText: { color: colors.muted, fontSize: 14 }, link: { color: colors.blue, fontWeight: '800', fontSize: 14 } });
+const styles = StyleSheet.create({ page: { flex: 1, backgroundColor: colors.background }, content: { flexGrow: 1, justifyContent: 'center', padding: 24 }, header: { alignItems: 'center', marginBottom: 26 }, logo: { width: 72, height: 72, marginBottom: 10 }, brand: { color: colors.blue, fontWeight: '900', fontSize: 18 }, title: { color: colors.blue, fontWeight: '800', fontSize: 25, marginTop: 18 }, subtitle: { color: colors.muted, fontSize: 14, marginTop: 7 }, card: { backgroundColor: colors.surface, padding: 24, borderRadius: 24, borderWidth: 1, borderColor: colors.border }, label: { color: colors.muted, fontWeight: '700', fontSize: 13, marginBottom: 8, marginTop: 12 }, input: { height: 52, borderRadius: 14, backgroundColor: colors.background, paddingHorizontal: 15, color: colors.text, fontSize: 15, borderWidth: 1, borderColor: colors.border }, passwordField: { minHeight: 52, flexDirection: 'row', alignItems: 'center', borderRadius: 14, backgroundColor: colors.background, borderWidth: 1, borderColor: colors.border }, passwordInput: { flex: 1, height: 52, paddingHorizontal: 15, color: colors.text, fontSize: 15 }, passwordToggle: { height: 52, minWidth: 48, alignItems: 'center', justifyContent: 'center' }, hint: { color: colors.dim, fontSize: 12, marginTop: 6 }, error: { color: colors.red, fontSize: 13, lineHeight: 19, marginTop: 13 }, button: { height: 54, marginTop: 22, borderRadius: 15, backgroundColor: colors.blue, alignItems: 'center', justifyContent: 'center' }, buttonText: { color: 'white', fontSize: 16, fontWeight: '800' }, pressed: { opacity: 0.82 }, footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 21 }, footerText: { color: colors.muted, fontSize: 14 }, link: { color: colors.blue, fontWeight: '800', fontSize: 14 } });

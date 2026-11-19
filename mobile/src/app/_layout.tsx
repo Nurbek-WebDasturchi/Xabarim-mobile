@@ -57,7 +57,7 @@ function RootNavigator() {
   useEffect(() => {
     if (loading) return;
     const onAuthRoute = segments[0] === 'login' || segments[0] === 'register';
-    if (!session && !onAuthRoute) router.replace('/login');
+    if (!session && !onAuthRoute) router.replace('/register');
     if (session && onAuthRoute) router.replace('/chats');
   }, [session, loading, segments]);
 

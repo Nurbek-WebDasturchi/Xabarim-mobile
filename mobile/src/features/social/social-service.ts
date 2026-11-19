@@ -69,9 +69,29 @@ export async function loadFollowingFeed(userId: string): Promise<Post[]> {
   return posts.map((post) => ({ ...post, profiles: byId.get(post.author) }));
 }
 
-export async function createPost(author: string, body: string) {
-  const { error } = await getSupabaseClient().from('posts').insert({ author, body });
+export async function createPost(author: string, body: string, imageUrl?: string) {
+  const { error } = await getSupabaseClient().from('posts').insert({ author, body: body || null, image_url: imageUrl ?? null });
   if (error) throw error;
+}
+
+export async function loadSuggestedProfiles(userId: string, limit = 30): Promise<Profile[]> {
+  const db = getSupabaseClient();
+  const { data: follows, error: followsError } = await db.from('follows').select('following').eq('follower', userId);
+  if (followsError) throw followsError;
+  const { data: requests, error: requestsError } = await db.from('follow_requests').select('target_id').eq('requester_id', userId);
+  if (requestsError && requestsError.code !== '42P01') throw requestsError;
+  const excluded = new Set([userId, ...(follows ?? []).map((row) => row.following), ...(requests ?? []).map((row) => row.target_id)]);
+  const { data, error } = await db.from('profiles').select('id,username,full_name,avatar_url,bio,last_seen,is_private').neq('id', userId).limit(limit + excluded.size + 50);
+  if (error) throw error;
+  return ((data ?? []) as Profile[]).filter((profile) => !excluded.has(profile.id)).slice(0, limit);
+}
+
+export async function searchProfiles(query: string, userId: string, limit = 30): Promise<Profile[]> {
+  const db = getSupabaseClient();
+  const escaped = query.replace(/[\\%_]/g, (character) => `\\${character}`);
+  const { data, error } = await db.from('profiles').select('id,username,full_name,avatar_url,bio,last_seen,is_private').or(`username.ilike.%${escaped}%,full_name.ilike.%${escaped}%`).neq('id', userId).limit(limit);
+  if (error) throw error;
+  return (data ?? []) as Profile[];
 }
 
 export async function loadFollowStats(userId: string) {
