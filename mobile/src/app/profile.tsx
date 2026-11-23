@@ -1,4 +1,4 @@
-import { Redirect, useLocalSearchParams } from 'expo-router';
+import { Redirect, useLocalSearchParams , router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AppNav } from '@/components/app-nav';
@@ -7,7 +7,9 @@ import { useThemeColors, type ThemeColors } from '@/components/theme';
 import { useAuth } from '@/features/auth/auth-context';
 import { cancelFollowRequest, decideFollowRequest, followUser, loadFollowState, loadFollowStats, loadIncomingFollowRequests, unfollowUser, updateAccountPrivacy, updateMyProfile, type FollowState } from '@/features/social/social-service';
 import { getSupabaseClient } from '@/lib/supabase';
-import { useLanguage, useT } from '@/features/i18n/i18n';
+import { useLanguage, useT , useUiText } from '@/features/i18n/i18n';
+
+
 
 type Stats = { followers_count?: number; following_count?: number } | null;
 
@@ -16,11 +18,13 @@ export default function ProfileScreen() {
   const styles = createStyles(palette);
   const { user, profile, session, loading, signOut, refreshProfile } = useAuth();
   const t = useT();
+  const ui = useUiText();
   const { language, setLanguage } = useLanguage();
   const { userId: rawViewedId } = useLocalSearchParams<{ userId?: string }>();
   const viewedId = Array.isArray(rawViewedId) ? rawViewedId[0] : rawViewedId;
   const isOther = !!viewedId && viewedId !== user?.id;
   const [viewed, setViewed] = useState<any>(null);
+  const [followState, setFollowState] = useState<FollowState>('none');
   useEffect(() => { if (isOther) void getSupabaseClient().from('profiles').select('id,username,full_name,avatar_url,bio,is_private').eq('id', viewedId).maybeSingle().then(({ data }) => setViewed(data)); }, [isOther, viewedId]);
   const shown = isOther ? viewed : profile;
   useEffect(() => { if (isOther && user && viewedId) void loadFollowState(user.id, viewedId).then(setFollowState).catch(() => setFollowState('none')); }, [isOther, user, viewedId]);
@@ -34,7 +38,6 @@ export default function ProfileScreen() {
   const [requests, setRequests] = useState<any[]>([]);
   const [followBusy, setFollowBusy] = useState(false);
   const [requestError, setRequestError] = useState('');
-  const [followState, setFollowState] = useState<FollowState>('none');
   const refreshRequests = useCallback(async () => { if (!user || isOther) return; try { setRequests(await loadIncomingFollowRequests(user.id)); } catch (e) { setRequestError(e instanceof Error ? e.message : 'So‘rovlar yuklanmadi.'); } }, [user, isOther]);
   useEffect(() => { void refreshRequests(); }, [refreshRequests]);
   useEffect(() => { setName(profile?.full_name ?? ''); setBio(profile?.bio ?? ''); }, [profile]);
@@ -67,6 +70,8 @@ export default function ProfileScreen() {
       </View>
       {isOther ? <View style={styles.editCard}>{shown?.is_private && followState !== 'following' && <Text style={styles.notice}>{t('privacyNotice')}</Text>}{!!requestError && <Text style={styles.error}>{requestError}</Text>}<Pressable disabled={followBusy} onPress={() => void toggleViewedFollow()} style={styles.save}>{followBusy ? <ActivityIndicator color="white" /> : <Text style={styles.saveText}>{followState === 'following' ? t('following') : followState === 'pending' ? t('requested') : t('follow')}</Text>}</Pressable></View> : <><View style={styles.editCard}><Text style={styles.section}>{t('accountType')}</Text><View style={styles.privacyRow}>{([false, true] as const).map((value) => <Pressable key={String(value)} disabled={saving} onPress={() => void setPrivate(value)} style={[styles.privacyOption, !!profile?.is_private === value && styles.privacySelected]}><Text style={[styles.privacyText, !!profile?.is_private === value && styles.privacySelectedText]}>{value ? t('private') : t('public')}</Text></Pressable>)}</View></View><View style={styles.editCard}><Text style={styles.section}>{t('profileInfo')}</Text><Text style={styles.label}>{t('name')}</Text><TextInput value={name} onChangeText={setName} placeholder={t('namePlaceholder')} placeholderTextColor="#9697A9" maxLength={60} style={styles.input} /><Text style={styles.label}>{t('bio')}</Text><TextInput value={bio} onChangeText={setBio} placeholder={t('bioPlaceholder')} placeholderTextColor="#9697A9" maxLength={160} multiline style={[styles.input, styles.bio]} /><Text style={styles.counter}>{bio.length}/160</Text>{changed && <Pressable onPress={save} disabled={saving} style={styles.save}>{saving ? <ActivityIndicator color="white" /> : <Text style={styles.saveText}>{t('save')}</Text>}</Pressable>}</View><View style={styles.editCard}><Text style={styles.section}>{t('requests')} · {requests.length}</Text>{!!requestError && <Text style={styles.error}>{requestError}</Text>}{requests.length === 0 ? <Text style={styles.notice}>{t('noRequests')}</Text> : requests.map((request) => <View key={request.id} style={styles.requestRow}><View style={styles.requestInfo}><Text style={styles.name}>{request.profiles?.full_name || request.profiles?.username}</Text><Text style={styles.username}>@{request.profiles?.username}</Text></View><Pressable disabled={followBusy} onPress={() => void reviewRequest(request.id, request.requester_id, false)} style={styles.decline}><Text style={styles.declineText}>{t('decline')}</Text></Pressable><Pressable disabled={followBusy} onPress={() => void reviewRequest(request.id, request.requester_id, true)} style={styles.accept}><Text style={styles.acceptText}>{t('accept')}</Text></Pressable></View>)}</View><View style={styles.editCard}><Text style={styles.section}>{t('language')}</Text><View style={styles.privacyRow}>{(['uz', 'ru', 'en'] as const).map((item) => <Pressable key={item} onPress={() => setLanguage(item)} style={[styles.privacyOption, language === item && styles.privacySelected]}><Text style={[styles.privacyText, language === item && styles.privacySelectedText]}>{item.toUpperCase()}</Text></Pressable>)}</View></View></>}
       {!!error && <Text style={styles.error}>{error}</Text>}
+      {!isOther && <Pressable onPress={() => router.push('/wallet' as never)} style={styles.editCard}><Text style={styles.section}>{ui.xcoin} · {profile?.xcoin_balance ?? 0}</Text><Text style={styles.notice}>{profile?.premium ? ui.active : ui.premium}</Text></Pressable>}
+      {!isOther && <Pressable onPress={() => router.push('/privacy' as never)} style={styles.editCard}><Text style={styles.section}>{ui.privacyPolicy}</Text></Pressable>}
       <View style={styles.info}><Text style={styles.infoLabel}>Xabarim ID</Text><Text selectable style={styles.infoValue}>{profile?.id}</Text></View>
     </ScrollView>
     <AppNav />

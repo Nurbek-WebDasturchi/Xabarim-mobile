@@ -104,6 +104,12 @@ export async function joinCommunity(roomId: number, userId: string) {
   if (error && error.code !== '23505') throw error;
 }
 
+export async function loadCommunityMembers(roomId: number) {
+  const { data, error } = await client().rpc('community_members', { p_room_id: roomId });
+  if (error) throw error;
+  return (data ?? []) as { user_id: string; username: string; full_name: string | null; avatar_url: string | null }[];
+}
+
 export async function sendRoomMessage(userId: string, roomId: number, body: string): Promise<Message> {
   const { data, error } = await client().from('messages').insert({ sender: userId, room_id: roomId, body }).select('id,sender,receiver,body,file_url,file_type,created_at,read,delivered_at,room_id').single();
   if (error) throw error;

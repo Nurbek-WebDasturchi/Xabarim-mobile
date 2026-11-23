@@ -4,26 +4,24 @@ import { ActivityIndicator, Alert, FlatList, Image, Pressable, RefreshControl, S
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/features/auth/auth-context';
 import { addPostComment, createPost, loadFeed, loadFollowingFeed, loadPostEngagement, reactToPost, removePostReaction, type Post, type PostComment } from '@/features/social/social-service';
-import { getSupabaseClient } from '@/lib/supabase';
 import { AppNav } from '@/components/app-nav';
 import { AppHeader } from '@/components/app-header';
 import { useThemeColors, type ThemeColors } from '@/components/theme';
+import { getSupabaseClient } from '@/lib/supabase';
 import { isVideoUrl, PostVideo } from '@/components/post-video';
 import * as ImagePicker from 'expo-image-picker';
 
-type Note = { user_id: string; text: string; created_at: string };
 type FeedTab = 'global' | 'following' | 'trending';
+const getTapTime = () => Date.now();
 
 export default function FeedScreen() {
   const palette = useThemeColors();
   const styles = createStyles(palette);
-  const { user, profile, session, loading } = useAuth();
+  const { user, session, loading } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [feedTab, setFeedTab] = useState<FeedTab>('global');
-  const [notes, setNotes] = useState<Note[]>([]);
   const [draft, setDraft] = useState('');
   const [media, setMedia] = useState<{ uri: string; mimeType: string; fileName: string; fileSize?: number; kind: 'image' | 'video' } | null>(null);
-  const [noteDraft, setNoteDraft] = useState('');
   const [commentPostId, setCommentPostId] = useState<number | null>(null);
   const [commentDraft, setCommentDraft] = useState('');
   const [busy, setBusy] = useState(true);
@@ -35,31 +33,24 @@ export default function FeedScreen() {
   const [likeCounts, setLikeCounts] = useState<Record<number, number>>({});
   const [likedPosts, setLikedPosts] = useState<number[]>([]);
   const [comments, setComments] = useState<Record<number, PostComment[]>>({});
+  const [mentionUsers, setMentionUsers] = useState<{ id: string; username: string }[]>([]);
   const [imageRatios, setImageRatios] = useState<Record<number, number>>({});
+  const [commentIdSeed] = useState(() => Math.floor(Math.random() * 1_000_000_000));
   const load = useCallback(async () => {
     if (!user) return;
     try {
       setError('');
-      const db = getSupabaseClient();
-      const [feed, noteResult] = await Promise.all([
-        feedTab === 'following' ? loadFollowingFeed(user.id) : loadFeed(),
-        db.rpc('feed_notes').then(async (result) => {
-          if (!result.error && result.data) return result.data as Note[];
-          const fallback = await db.from('notes').select('user_id,text,created_at').gt('created_at', new Date(Date.now() - 864e5).toISOString()).limit(80);
-          if (fallback.error) throw fallback.error;
-          return (fallback.data ?? []) as Note[];
-        }),
-      ]);
+      const feed = feedTab === 'following' ? await loadFollowingFeed(user.id) : await loadFeed();
       const engagement = await loadPostEngagement(feed.map((post) => post.id), user.id);
       setPosts(feed);
       setLikeCounts(engagement.likes);
       setLikedPosts(engagement.liked);
       setComments(engagement.comments);
-      setNotes(noteResult);
     } catch (e) { setError(e instanceof Error ? e.message : 'Lentani yuklab bo‘lmadi.'); }
     finally { setBusy(false); setRefreshing(false); }
   }, [user, feedTab]);
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => { if (!user) return; let active = true; void getSupabaseClient().from('profiles').select('id,username').neq('id', user.id).limit(100).then(({ data }) => { if (active) setMentionUsers(data ?? []); }); return () => { active = false; }; }, [user]);
   if (!loading && !session) return <Redirect href="/login" />;
   const publish = async () => {
     if ((!draft.trim() && !media) || !user || posting) return;
@@ -91,21 +82,6 @@ export default function FeedScreen() {
       setMedia({ uri: asset.uri, mimeType: asset.mimeType || (kind === 'video' ? 'video/mp4' : 'image/jpeg'), fileName: asset.fileName || `${kind}-${Date.now()}.${kind === 'video' ? 'mp4' : 'jpg'}`, fileSize: asset.fileSize, kind });
     } catch (e) { setError(e instanceof Error ? e.message : 'Media tanlab bo‘lmadi.'); }
   };
-  const publishNote = async () => {
-    if (!noteDraft.trim() || noteDraft.trim().length > 60 || !user || posting) return;
-    setPosting(true);
-    try {
-      const db = getSupabaseClient();
-      const { error: rpcError } = await db.rpc('set_note', { p_text: noteDraft.trim() });
-      if (rpcError) {
-        if (rpcError.code !== 'PGRST202' && rpcError.code !== '42883') throw rpcError;
-        const { error: saveError } = await db.from('notes').upsert({ user_id: user.id, text: noteDraft.trim(), created_at: new Date().toISOString() }, { onConflict: 'user_id' });
-        if (saveError) throw saveError;
-      }
-      setNoteDraft(''); await load();
-    } catch (e) { setError(e instanceof Error ? e.message : 'Note saqlanmadi.'); }
-    finally { setPosting(false); }
-  };
   const like = async (post: Post, forceLike = false) => {
     if (!user) return;
     const wasLiked = likedPosts.includes(post.id);
@@ -119,8 +95,9 @@ export default function FeedScreen() {
       setError(e instanceof Error ? e.message : 'Reaksiya yuborilmadi.');
     }
   };
+  // Read the clock only in response to a user tap, never during rendering.
   const onPostImagePress = (post: Post) => {
-    const now = Date.now();
+    const now = getTapTime();
     const previousTap = lastImageTap.current;
     lastImageTap.current = { postId: post.id, time: now };
     if (previousTap?.postId === post.id && now - previousTap.time < 450) {
@@ -137,24 +114,21 @@ export default function FeedScreen() {
   const comment = async (postId: number) => {
     const body = commentDraft.trim();
     if (!body) return;
-    try { await addPostComment(postId, body); setComments((current) => ({ ...current, [postId]: [...(current[postId] ?? []), { id: Date.now(), post_id: postId, user_id: user?.id || '', body, created_at: new Date().toISOString() }] })); setCommentDraft(''); }
+    try { await addPostComment(postId, body); setComments((current) => ({ ...current, [postId]: [...(current[postId] ?? []), { id: commentIdSeed + (current[postId]?.length ?? 0) + 1, post_id: postId, user_id: user?.id || '', body, created_at: new Date().toISOString() }] })); setCommentDraft(''); }
     catch (e) { setError(e instanceof Error ? e.message : 'Izoh yuborilmadi.'); }
   };
+  const commentMention = commentDraft.match(/(?:^|\s)@([a-zA-Z0-9_]{0,24})$/)?.[1];
   return <View style={styles.page}>
     <AppHeader />
     <View style={styles.header}><Text style={styles.title}>Postlar</Text><View style={styles.filters}>{([['global', '◎ Global'], ['following', '♧ Kuzatilmoqda'], ['trending', '♨ Trend']] as const).map(([tab, label]) => <Pressable key={tab} accessibilityRole="button" accessibilityState={{ selected: feedTab === tab }} onPress={() => selectFeedTab(tab)} style={feedTab === tab ? styles.filterActive : styles.filter}><Text style={feedTab === tab ? styles.filterActiveText : styles.filterText}>{label}</Text></Pressable>)}</View></View>
     <FlatList data={posts} extraData={feedTab} keyExtractor={(item) => String(item.id)} contentContainerStyle={styles.list} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); void load(); }} tintColor="#5848E8" />} ListHeaderComponent={<>
-      <View style={styles.notesHeading}><Text style={styles.sectionTitle}>24 soatlik Notelar</Text><Text style={styles.noteCount}>{notes.length}</Text></View>
-      <View style={styles.noteComposer}><TextInput value={noteDraft} onChangeText={setNoteDraft} placeholder="Bugun nima gap?" placeholderTextColor="#9697A9" maxLength={60} style={styles.noteInput} /><Pressable onPress={publishNote} disabled={!noteDraft.trim() || posting} style={styles.noteButton}><Text style={styles.noteButtonText}>＋</Text></Pressable></View>
-      {notes.length > 0 && <FlatList horizontal data={notes} keyExtractor={(item) => item.user_id} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.notesList} renderItem={({ item }) => <View style={styles.noteCard}><View style={styles.noteDot}><Text style={styles.noteDotText}>{item.user_id === user?.id ? 'S' : '✦'}</Text></View><Text numberOfLines={2} style={styles.noteText}>{item.text}</Text></View>} />}
-      <View style={styles.sectionLine}><Text style={styles.sectionTitle}>Postlar</Text><Text style={styles.postCount}>{posts.length}</Text></View>
-      <View style={styles.composeCard}><TextInput value={draft} onChangeText={setDraft} placeholder="Nima yangilik?" placeholderTextColor="#9697A9" multiline maxLength={2000} style={styles.composeInput} />{media && <View style={styles.mediaPreview}>{media.kind === 'image' ? <Image source={{ uri: media.uri }} style={styles.mediaThumb} resizeMode="cover" /> : <View style={[styles.mediaThumb, styles.videoThumb]}><Ionicons name="videocam" color="white" size={28} /></View>}<Text numberOfLines={1} style={styles.mediaName}>{media.fileName}</Text><Pressable accessibilityRole="button" accessibilityLabel="Mediani olib tashlash" onPress={() => setMedia(null)}><Ionicons name="close-circle" color={palette.muted} size={24} /></Pressable></View>}<View style={styles.composeBottom}><View style={styles.mediaActions}><Pressable accessibilityRole="button" accessibilityLabel="Rasm tanlash" onPress={() => void pickMedia('image')} style={styles.mediaButton}><Ionicons name="image-outline" size={20} color={palette.blue} /><Text style={styles.mediaButtonText}>Rasm</Text></Pressable><Pressable accessibilityRole="button" accessibilityLabel="Video tanlash" onPress={() => void pickMedia('video')} style={styles.mediaButton}><Ionicons name="videocam-outline" size={20} color={palette.blue} /><Text style={styles.mediaButtonText}>Video</Text></Pressable></View><View style={styles.publishGroup}><Text style={styles.charCount}>{draft.length}/2000</Text><Pressable onPress={publish} disabled={(!draft.trim() && !media) || posting} style={[styles.publishButton, (!draft.trim() && !media) && styles.disabled]}>{posting ? <ActivityIndicator color="white" size="small" /> : <Text style={styles.publishText}>Joylash</Text>}</Pressable></View></View></View>
+      <View style={styles.composeCard}><Text style={styles.sectionTitle}>Post yozish</Text><TextInput value={draft} onChangeText={setDraft} placeholder="Nima yangilik?" placeholderTextColor="#9697A9" multiline maxLength={2000} style={styles.composeInput} />{media && <View style={styles.mediaPreview}>{media.kind === 'image' ? <Image source={{ uri: media.uri }} style={styles.mediaThumb} resizeMode="cover" /> : <View style={[styles.mediaThumb, styles.videoThumb]}><Ionicons name="videocam" color="white" size={28} /></View>}<Text numberOfLines={1} style={styles.mediaName}>{media.fileName}</Text><Pressable accessibilityRole="button" accessibilityLabel="Mediani olib tashlash" onPress={() => setMedia(null)}><Ionicons name="close-circle" color={palette.muted} size={24} /></Pressable></View>}<View style={styles.composeBottom}><View style={styles.mediaActions}><Pressable accessibilityRole="button" accessibilityLabel="Rasm tanlash" onPress={() => void pickMedia('image')} style={styles.mediaButton}><Ionicons name="image-outline" size={20} color={palette.blue} /><Text style={styles.mediaButtonText}>Rasm</Text></Pressable><Pressable accessibilityRole="button" accessibilityLabel="Video tanlash" onPress={() => void pickMedia('video')} style={styles.mediaButton}><Ionicons name="videocam-outline" size={20} color={palette.blue} /><Text style={styles.mediaButtonText}>Video</Text></Pressable></View><View style={styles.publishGroup}><Text style={styles.charCount}>{draft.length}/2000</Text><Pressable onPress={publish} disabled={(!draft.trim() && !media) || posting} style={[styles.publishButton, (!draft.trim() && !media) && styles.disabled]}>{posting ? <ActivityIndicator color="white" size="small" /> : <Text style={styles.publishText}>Joylash</Text>}</Pressable></View></View></View>
       {!!error && <Pressable onPress={() => void load()}><Text style={styles.error}>{error}  ·  Yangilash</Text></Pressable>}
     </>} ListEmptyComponent={busy ? <ActivityIndicator style={{ marginTop: 35 }} color={palette.blue} /> : <Text style={styles.empty}>{feedTab === 'following' ? 'Kuzatayotgan foydalanuvchilaringizda hozircha post yo‘q.' : 'Hozircha post yo‘q. Birinchi bo‘lib ulashing.'}</Text>} renderItem={({ item }) => <View style={styles.postCard}>
       <View style={styles.postHeader}>{item.profiles?.avatar_url ? <Image source={{ uri: item.profiles.avatar_url }} style={styles.authorAvatar} /> : <View style={styles.authorAvatar}><Text style={styles.authorInitial}>{(item.profiles?.full_name || item.profiles?.username || 'X').slice(0, 1).toUpperCase()}</Text></View>}<View style={styles.authorDetails}><Text style={styles.authorName}>{item.profiles?.full_name || item.profiles?.username || 'Xabarim foydalanuvchisi'}</Text><Text style={styles.authorMeta}>@{item.profiles?.username || 'user'} · {new Date(item.created_at).toLocaleDateString('uz-UZ', { day: 'numeric', month: 'short' })}</Text></View></View>
       {!!item.body && <Text style={styles.postBody}>{item.body}</Text>}{!!item.image_url && (isVideoUrl(item.image_url) ? <View style={[styles.postImageWrap, { height: 250 }]}><PostVideo uri={item.image_url} /></View> : <Pressable onPress={() => onPostImagePress(item)} style={[styles.postImageWrap, { height: undefined }]}><Image source={{ uri: item.image_url }} style={[styles.postImage, { height: undefined, aspectRatio: imageRatios[item.id] ?? 1 }]} onLoad={(event) => { const { width, height } = event.nativeEvent.source; if (width && height) { const ratio = Math.min(1.91, Math.max(0.8, width / height)); setImageRatios((current) => current[item.id] === ratio ? current : { ...current, [item.id]: ratio }); } }} resizeMode="cover" />{likedAnimation === item.id && <View pointerEvents="none" style={styles.likeOverlay}><Text style={styles.bigHeart}>♥</Text></View>}</Pressable>)}
       <View style={styles.actions}><Pressable onPress={() => void like(item)} style={styles.action}><Text style={[styles.likeIcon, likedPosts.includes(item.id) && { color: palette.red }]}>♥</Text><Text style={styles.actionCount}>{likeCounts[item.id] ?? 0}</Text></Pressable><Pressable onPress={() => setCommentPostId((current) => current === item.id ? null : item.id)} style={styles.action}><Ionicons name="chatbubble-outline" size={25} color={palette.text} /><Text style={styles.actionCount}>{comments[item.id]?.length ?? 0}</Text></Pressable></View>
-      {commentPostId === item.id && <View style={{ paddingHorizontal: 14, paddingTop: 5 }}>{(comments[item.id] ?? []).map((row) => <View key={row.id} style={{ flexDirection: 'row', marginTop: 6 }}><Text style={{ color: palette.text, fontWeight: '800', fontSize: 12 }}>{row.user_id === user?.id ? 'Siz' : 'Foydalanuvchi'} </Text><Text style={{ color: palette.muted, fontSize: 12, flex: 1 }}>{row.body}</Text></View>)}<View style={styles.commentComposer}><TextInput value={commentDraft} onChangeText={setCommentDraft} placeholder="Izoh yozing..." placeholderTextColor={palette.dim} maxLength={1000} style={styles.commentInput} /><Pressable onPress={() => void comment(item.id)}><Text style={styles.commentSend}>Yuborish</Text></Pressable></View></View>}
+      {commentPostId === item.id && <View style={{ paddingHorizontal: 14, paddingTop: 5 }}>{(comments[item.id] ?? []).map((row) => <View key={row.id} style={{ flexDirection: 'row', marginTop: 6 }}><Text style={{ color: palette.text, fontWeight: '800', fontSize: 12 }}>{row.user_id === user?.id ? 'Siz' : 'Foydalanuvchi'} </Text><Text style={{ color: palette.muted, fontSize: 12, flex: 1 }}>{row.body}</Text></View>)}{commentMention !== undefined && mentionUsers.filter((entry) => entry.username.toLowerCase().startsWith(commentMention.toLowerCase())).slice(0, 4).map((entry) => <Pressable key={entry.id} onPress={() => setCommentDraft((current) => current.replace(/(?:^|\s)@([a-zA-Z0-9_]{0,24})$/, (match) => `${match.startsWith(' ') ? ' ' : ''}@${entry.username} `))} style={{ paddingVertical: 7 }}><Text style={{ color: palette.blue, fontWeight: '700' }}>@{entry.username}</Text></Pressable>)}<View style={styles.commentComposer}><TextInput value={commentDraft} onChangeText={setCommentDraft} placeholder="Izoh yozing..." placeholderTextColor={palette.dim} maxLength={1000} style={styles.commentInput} /><Pressable onPress={() => void comment(item.id)}><Text style={styles.commentSend}>Yuborish</Text></Pressable></View></View>}
     </View>} />
     <AppNav />
   </View>;

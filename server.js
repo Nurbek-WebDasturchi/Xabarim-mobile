@@ -40,6 +40,9 @@ app.post("/api/push/register", async (req, res) => {
     return res.status(500).json({ error: "PUSH_TOKEN_SAVE_FAILED" });
   }
 });
+app.get("/api/mobile/version", (req, res) => {
+  res.set("Cache-Control", "no-store").json({ version: process.env.MOBILE_APP_VERSION || "0.9.1", downloadUrl: process.env.MOBILE_APP_DOWNLOAD_URL || "https://www.xabarim.uz/download" });
+});
 app.post("/api/push/message", async (req, res) => {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return res.status(503).json({ error: "PUSH_NOT_CONFIGURED" });
   try {

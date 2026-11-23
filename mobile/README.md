@@ -31,8 +31,10 @@ Google OAuth, group/community screens, media uploads, push notification navigati
 
 ## Android install and in-app updates
 
-Create the installable production APK with `npm run build:android`. Users install this APK once. Compatible JavaScript, screen layout, text, and bundled asset updates can then be published to the production channel with `npm run update:production -- --message "Describe the change"`. On app launch the app checks for an update and shows **Yangi versiya mavjud**; the user taps **Yangilash** to download and apply it.
+Create the installable production APK with `npm run build:android`. Users install this APK once. Compatible JavaScript, screen layout, text, and bundled asset updates can then be published to the production channel with `npm run update:production -- --message "Describe the change"`. The app checks for updates on launch and resume; it prompts with an in-app modal. Users can also use **Yangilanishni tekshirish** in settings to check manually, then tap **Yangilash** to download and apply the update.
 
 The app uses Expo's `fingerprint` runtime policy. Native changes, app permissions, native dependencies, and SDK upgrades produce a different runtime and require a new APK. Publish native-dependent changes only with a build; EAS Update will target only builds with a matching runtime. To release a new APK, increment the app version in `app.json`, build it, and distribute the APK.
+
+To publish an app update notice to devices with push notifications enabled, send an Expo push notification to the registered device tokens with `title`, `body`, and `data: { "type": "app_update" }`. This opens the in-app OTA update modal when the notification arrives while the app is open. Expo Update availability is still checked automatically on app launch and resume.
 
 Use `npm run update:preview -- --message "Describe the change"` for updates to the preview channel. EAS CLI authentication and the linked EAS project are required to build or publish.

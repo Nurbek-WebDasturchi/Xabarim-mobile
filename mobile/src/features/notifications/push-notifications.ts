@@ -1,6 +1,7 @@
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { AndroidImportance } from 'expo-notifications';
 import { Platform } from 'react-native';
 import type { Session } from '@supabase/supabase-js';
 
@@ -22,7 +23,7 @@ export async function registerPushNotifications(session: Session) {
     await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
       name: 'Xabarim bildirishnomalari',
       description: 'Xabarlar, yoqtirishlar va yangi kuzatuvchilar',
-      importance: Notifications.AndroidImportance.MAX,
+      importance: AndroidImportance.MAX,
       vibrationPattern: [0, 220, 120, 220],
       lightColor: '#5848E8',
       sound: 'default',

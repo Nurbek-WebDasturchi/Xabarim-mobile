@@ -9,11 +9,12 @@ import { useT } from '@/features/i18n/i18n';
 export function AppNav() {
   const t = useT();
   const items = [
-    { path: '/feed', label: t('posts'), icon: 'home' },
-    { path: '/communities', label: t('groups'), icon: 'users' },
-    { path: '/chats', label: t('chats'), icon: 'message-circle' },
-    { path: '/friends', label: t('exploreFriends'), icon: 'search' },
-    { path: '/profile', label: t('profile'), icon: 'user' },
+    { path: '/wallet', label: 'XCoin', icon: 'dollar-sign' as const },
+    { path: '/feed', label: t('posts'), icon: 'home' as const },
+    { path: '/communities', label: t('community'), icon: 'users' as const },
+    { path: '/chats', label: t('chats'), icon: 'message-circle' as const },
+    { path: '/friends', label: t('exploreFriends'), icon: 'search' as const },
+    { path: '/profile', label: t('profile'), icon: 'user' as const },
   ] as const;
   const pathname = usePathname();
   const palette = useThemeColors();
@@ -21,7 +22,7 @@ export function AppNav() {
   const insets = useSafeAreaInsets();
   const styles = makeStyles(palette);
   return <View pointerEvents="box-none" style={[styles.wrap, { bottom: Math.max(insets.bottom, 8) + 10 }]}><BlurView intensity={86} tint={mode} style={styles.bar}>{items.map((item) => {
-    const active = pathname === item.path;
+    const active = pathname === item.path || pathname.startsWith(`${item.path}/`);
     return <Pressable key={item.path} accessibilityRole="button" accessibilityState={{ selected: active }} onPress={() => router.replace(item.path as never)} style={[styles.item, active && styles.selected]}>
       <Feather name={item.icon} size={20} color={active ? palette.blue : palette.muted} /><Text numberOfLines={1} style={[styles.label, active && styles.active]}>{item.label}</Text>
   </Pressable>;
