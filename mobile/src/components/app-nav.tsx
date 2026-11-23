@@ -13,7 +13,7 @@ export function AppNav() {
     { path: '/feed', label: t('posts'), icon: 'home' as const },
     { path: '/communities', label: t('community'), icon: 'users' as const },
     { path: '/chats', label: t('chats'), icon: 'message-circle' as const },
-    { path: '/friends', label: t('exploreFriends'), icon: 'search' as const },
+    { path: '/friends', label: 'Do‘stlar', icon: 'search' as const },
     { path: '/profile', label: t('profile'), icon: 'user' as const },
   ] as const;
   const pathname = usePathname();

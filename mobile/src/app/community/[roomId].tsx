@@ -1,12 +1,12 @@
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/features/auth/auth-context';
 import { useThemeColors, type ThemeColors } from '@/components/theme';
-import { joinCommunity, loadCommunity, loadCommunityMembers, loadCommunityPreview, loadRoomMessages, markRoomRead, sendRoomMessage, subscribeToMessages, type Community, type Message } from '@/features/chats/chat-service';
+import { describeChatLoadError, joinCommunity, loadCommunity, loadCommunityMembers, loadCommunityPreview, loadRoomMessages, markRoomRead, sendRoomMessage, subscribeToMessages, type Community, type Message } from '@/features/chats/chat-service';
 
 export default function CommunityScreen() {
   const palette = useThemeColors();
@@ -27,6 +27,13 @@ export default function CommunityScreen() {
   const [error, setError] = useState('');
   const [members, setMembers] = useState<{ user_id: string; username: string; full_name: string | null; avatar_url: string | null }[]>([]);
   const [membersVisible, setMembersVisible] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [failedDraft, setFailedDraft] = useState('');
+  useEffect(() => {
+    const show = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+    return () => { show.remove(); hide.remove(); };
+  }, []);
   const load = useCallback(async () => {
     if (!user || !Number.isFinite(roomId)) return;
     try {
@@ -72,23 +79,23 @@ export default function CommunityScreen() {
   const send = async () => {
     const body = draft.trim();
     if (!body || !user || sending || !member) return;
-    setSending(true); setDraft('');
+    setSending(true); setDraft(''); setFailedDraft('');
     try {
       const message = await sendRoomMessage(user.id, roomId, body);
       setMessages((current) => current.some((row) => row.id === message.id) ? current : [...current, message]);
       setMessageCount((count) => count + 1);
-    } catch (e) { setDraft(body); setError(e instanceof Error ? e.message : 'Xabar yuborilmadi.'); }
+    } catch (e) { setDraft(body); setFailedDraft(body); setError(describeChatLoadError(e, 'Xabar yuborilmadi')); }
     finally { setSending(false); }
   };
-  return <KeyboardAvoidingView style={styles.page} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+  return <KeyboardAvoidingView style={styles.page} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}>
     <View style={[styles.header, { height: 66 + insets.top, paddingTop: insets.top }]}><Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹</Text></Pressable><View style={styles.roomIcon}><Feather name="radio" size={20} color={palette.blue} /></View><View style={styles.titleWrap}><Text numberOfLines={1} style={styles.title}>{room?.name || 'Xabarim Official'}</Text><Pressable onPress={() => setMembersVisible(true)}><Text style={styles.subtitle}>{members.length} ta a’zo{member ? ' · A’zo' : ''}</Text></Pressable></View><Pressable accessibilityRole="button" accessibilityLabel="Hamjamiyat a’zolari" onPress={() => setMembersVisible(true)} style={styles.memberButton}><Feather name="users" size={19} color={palette.blue} /></Pressable></View>
     {busy ? <View style={styles.center}><ActivityIndicator color={palette.blue} /></View> : <FlatList ref={list} data={messages} keyExtractor={(item) => String(item.id)} contentContainerStyle={styles.messages} onContentSizeChange={() => list.current?.scrollToEnd({ animated: true })} ListHeaderComponent={!member && messageCount > 5 ? <View style={styles.locked}><View style={styles.fauxHistory} pointerEvents="none">{[0, 1, 2].map((item) => <View key={item} style={[styles.fauxBubble, item % 2 ? styles.fauxRight : styles.fauxLeft]}><View style={styles.fauxLine} /><View style={[styles.fauxLine, styles.fauxShort]} /></View>)}<BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} /></View><Feather name="lock" size={18} color={palette.blue} /><Text style={styles.lockedTitle}>{messageCount - 5} ta oldingi xabar yopiq</Text><Text style={styles.lockedText}>To‘liq tarixni ko‘rish uchun hamjamiyatga qo‘shiling.</Text><Pressable disabled={joining} onPress={() => void join()} style={({ pressed }) => [styles.joinButton, pressed && styles.pressed, joining && styles.disabled]}><Text style={styles.joinText}>{joining ? 'Qo‘shilyapti…' : 'Hamjamiyatga qo‘shilish'}</Text></Pressable></View> : undefined} ListEmptyComponent={<Text style={styles.empty}>Hozircha xabar yo‘q.</Text>} renderItem={({ item }) => {
       const mine = item.sender === user?.id;
       return <View style={[styles.line, mine ? styles.mine : styles.theirs]}><View style={[styles.bubble, mine ? styles.myBubble : styles.otherBubble]}>{!mine && <Text style={styles.sender}>Xabarim Official</Text>}<Text style={styles.body}>{item.body || (item.file_url ? '📎 Fayl' : '')}</Text><Text style={[styles.time, mine && styles.myTime]}>{new Date(item.created_at).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })}</Text></View></View>;
     }} />}
     {!busy && !member && <View style={[styles.previewFooter, { paddingBottom: Math.max(insets.bottom, Platform.OS === 'ios' ? 12 : 8) }]}><Text style={styles.previewText}>{messages.length ? `Oxirgi ${messages.length} ta xabar ko‘rsatilmoqda` : 'Kanal xabarlarini ko‘rish uchun qo‘shiling'}</Text>{!(messageCount > 5) && <Pressable disabled={joining} onPress={() => void join()} style={({ pressed }) => [styles.joinButton, pressed && styles.pressed]}><Text style={styles.joinText}>{joining ? 'Qo‘shilyapti…' : 'Qo‘shilish'}</Text></Pressable>}</View>}
-    {!!error && <Pressable onPress={() => void load()}><Text style={styles.error}>{error} · Qayta urinish</Text></Pressable>}
-    {member && <View style={[styles.composer, { paddingBottom: Math.max(insets.bottom, Platform.OS === 'ios' ? 12 : 8) }]}><TextInput value={draft} onChangeText={setDraft} placeholder="Xabar yozing..." placeholderTextColor={palette.dim} multiline style={styles.input} /><Pressable onPress={() => void send()} disabled={!draft.trim() || sending} style={styles.send}><Text style={styles.sendText}>➤</Text></Pressable></View>}
+    {!!error && <Pressable onPress={() => { if (failedDraft) void send(); else void load(); }}><Text style={styles.error}>{error} · Qayta urinish</Text></Pressable>}
+    {member && <View style={[styles.composer, { paddingBottom: keyboardVisible ? 8 : Math.max(insets.bottom, Platform.OS === 'ios' ? 12 : 8) }]}><TextInput value={draft} onChangeText={setDraft} placeholder="Xabar yozing..." placeholderTextColor={palette.dim} multiline style={styles.input} /><Pressable onPress={() => void send()} disabled={!draft.trim() || sending} style={styles.send}><Text style={styles.sendText}>➤</Text></Pressable></View>}
     <Modal visible={membersVisible} transparent animationType="slide" onRequestClose={() => setMembersVisible(false)}><View style={styles.modalBackdrop}><View style={[styles.memberSheet, { paddingBottom: Math.max(insets.bottom, 16) }]}><View style={styles.sheetTop}><Text style={styles.sheetTitle}>A’zolar · {members.length}</Text><Pressable onPress={() => setMembersVisible(false)}><Feather name="x" size={22} color={palette.text} /></Pressable></View><FlatList data={members} keyExtractor={(item) => item.user_id} ListEmptyComponent={<Text style={styles.empty}>A’zolar ro‘yxati bo‘sh.</Text>} renderItem={({ item }) => <Pressable onPress={() => { setMembersVisible(false); router.push({ pathname: '/profile', params: { userId: item.user_id } }); }} style={styles.memberRow}>{item.avatar_url ? <Image source={{ uri: item.avatar_url }} style={styles.memberAvatar} /> : <View style={[styles.memberAvatar, styles.memberInitialWrap]}><Text style={styles.memberInitial}>{(item.full_name || item.username || 'X').slice(0, 1).toUpperCase()}</Text></View>}<View><Text style={styles.memberName}>{item.full_name || item.username}</Text><Text style={styles.memberUsername}>@{item.username}</Text></View>{item.user_id === user?.id && <Text style={styles.youLabel}>Siz</Text>}</Pressable>} /></View></View></Modal>
   </KeyboardAvoidingView>;
 }
